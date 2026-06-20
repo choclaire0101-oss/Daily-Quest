@@ -1,0 +1,3248 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Quest ✨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F5F0EB; --bg2:#EDE5DC; --bg3:#E6DDD4;
+  --card:#FDFAF7; --card2:#F5EEE7; --border:#D6CBBF;
+  --teal:#97B3AE; --teal2:#6A9A94; --gold:#C4935A;
+  --zone-bg:linear-gradient(170deg,#B8CEC9 0%,#CCDAD7 60%,#B0C8C4 100%);
+  --green:#8FAE8B; --rose:#D4857A; --mint:#D2E0D3;
+  --text:#3D2B1F; --text2:#7A6050; --text3:#A8907A;
+  --r:12px; --shadow:0 4px 20px rgba(100,70,50,.1);
+  --c-common:#9E9E9E; --c-uncommon:#6BAE68; --c-rare:#5A9ED4;
+  --c-epic:#9A6DD4; --c-legendary:#D4A020; --c-mythic:#D45A8A;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Comic Neue',system-ui,sans-serif;min-height:100vh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;}
+h1,h2,.font-fancy{font-family:'Indie Flower',cursive;}
+.hidden{display:none!important;}
+
+/* CREATION OVERLAY */
+#create-overlay{position:fixed;inset:0;background:var(--bg);z-index:600;overflow-y:auto;padding:24px 20px 40px;display:flex;flex-direction:column;align-items:center;}
+#create-overlay h1{font-size:2rem;color:var(--teal2);margin-bottom:4px;text-align:center;font-weight:700;}
+#create-overlay .sub{font-size:0.85rem;color:var(--text2);text-align:center;margin-bottom:24px;}
+.create-step{width:100%;max-width:380px;}
+.create-label{font-family:'Indie Flower',cursive;font-size:1.05rem;color:var(--text2);margin-bottom:8px;display:block;}
+.create-input{width:100%;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 14px;color:var(--text);font-size:1rem;font-family:'Comic Neue',sans-serif;outline:none;margin-bottom:18px;}
+.create-input:focus{border-color:var(--teal);}
+.avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px;}
+.av-btn{font-size:1.8rem;background:var(--card);border:2px solid var(--border);border-radius:10px;padding:8px;cursor:pointer;text-align:center;transition:all .15s;}
+.av-btn.sel{border-color:var(--teal);background:rgba(151,179,174,.15);}
+.av-btn img{width:36px;height:36px;object-fit:contain;display:block;margin:0 auto;}
+.char-img{height:200px;width:auto;max-width:90%;object-fit:contain;display:block;margin:0 auto;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 6px 16px rgba(100,70,50,.2));}
+.pers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;justify-items:center;}
+.pers-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:10px 8px;cursor:pointer;text-align:center;transition:all .15s;width:100%;}
+.pers-btn .p-icon{font-size:1.4rem;}
+.pers-btn .p-name{font-family:'Indie Flower',cursive;font-size:0.85rem;color:var(--text);display:block;margin-top:3px;}
+.pers-btn .p-desc{font-size:0.65rem;color:var(--text3);display:block;margin-top:1px;}
+.pers-btn.sel{border-color:var(--gold);background:rgba(196,147,90,.1);}
+.pers-btn.sel::after{content:'✓';position:absolute;top:5px;right:7px;font-size:0.7rem;font-weight:700;color:var(--gold);}
+.pers-btn{position:relative;}
+.gender-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.gender-btn{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:18px 8px;cursor:pointer;text-align:center;transition:all .15s;}
+.gender-btn:hover{border-color:var(--teal);}
+.gender-btn.sel{border-color:var(--teal);background:rgba(151,179,174,.15);}
+.g-icon{font-size:2rem;margin-bottom:6px;}
+.g-name{font-family:'Indie Flower',cursive;font-size:0.9rem;color:var(--text);}
+.step-dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .2s;}
+.dot.active{background:var(--teal);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:0.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Comic Neue',sans-serif;width:100%;}
+.btn-teal{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#fff;box-shadow:0 2px 10px rgba(151,179,174,.35);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#A86830);color:#fff8f0;}
+.btn-green{background:linear-gradient(135deg,var(--green),#6A9466);color:#fff;}
+.btn-rose{background:linear-gradient(135deg,var(--rose),#B0554A);color:#fff;}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text2);}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal2);}
+.btn-sm{padding:6px 14px;font-size:0.78rem;width:auto;}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn-teal-light{background:#D8EAE8;color:#2E6A64;border:1.5px solid #97B3AE;box-shadow:none;}
+.btn-teal-light:hover:not(:disabled){background:#C8DFDC;border-color:#6A9A94;}
+.btn-gold-light{background:#F5E8D0;color:#7A4E1A;border:1.5px solid #C4935A;box-shadow:none;}
+.btn-gold-light:hover:not(:disabled){background:#EDD9BA;border-color:#A06830;}
+
+/* TOP BAR */
+#topbar{background:var(--card);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;box-shadow:var(--shadow);}
+.tb-title{font-family:'Indie Flower',cursive;font-size:1.15rem;color:var(--teal2);font-weight:700;}
+.tb-stat{font-size:0.78rem;font-weight:700;background:linear-gradient(135deg,var(--gold),#A86830);color:#fff8f0;padding:3px 9px;border-radius:20px;}
+.tb-right{display:flex;gap:8px;align-items:center;}
+.tb-music-pill{font-size:0.72rem;font-weight:700;color:var(--teal2);background:rgba(151,179,174,.18);border:1px solid var(--border);border-radius:20px;padding:2px 8px;cursor:pointer;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+/* MUSIC PLAYER */
+.music-track-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+.music-track-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:9px 4px;cursor:pointer;text-align:center;transition:all .15s;width:100%;}
+.music-track-btn:hover{border-color:var(--teal);}
+.music-track-btn.sel{border-color:var(--teal);background:rgba(151,179,174,.18);}
+.music-track-icon{font-size:1.3rem;display:block;margin-bottom:3px;}
+.music-track-name{font-size:0.65rem;color:var(--text2);display:block;line-height:1.2;}
+.music-vol-row{display:flex;align-items:center;gap:8px;}
+.music-vol-row input[type=range]{flex:1;accent-color:var(--teal);}
+.tb-badge{font-size:0.75rem;font-weight:700;color:var(--text2);}
+.tb-badge span{color:var(--text);}
+
+/* NAV */
+#bottomnav{background:var(--card);border-top:1px solid var(--border);display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:10;}
+.nav-btn{flex:1;padding:8px 2px 6px;background:none;border:none;cursor:pointer;color:var(--text3);font-size:0.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:color .15s;font-family:'Comic Neue',sans-serif;}
+.nav-btn .ni{font-size:1.15rem;}
+.nav-btn.active{color:var(--teal2);}
+
+/* MAIN CONTENT */
+#main{flex:1;padding:14px;padding-bottom:76px;overflow-y:auto;}
+.page{display:none;}.page.active{display:block;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);}
+.card-title{font-family:'Indie Flower',cursive;font-size:0.95rem;color:var(--text3);margin-bottom:10px;letter-spacing:.5px;}
+.section-title{font-family:'Indie Flower',cursive;font-size:0.8rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+
+/* HOME PAGE */
+.home-char-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);}
+.home-char-img-zone{background:var(--zone-bg,linear-gradient(170deg,#EDE5DC 0%,#F5EEE6 60%,#EAE0D6 100%));display:flex;align-items:flex-end;justify-content:center;min-height:210px;padding-top:16px;position:relative;}
+#home-avatar-wrap{display:flex;align-items:flex-end;justify-content:center;width:100%;transition:transform .2s cubic-bezier(.17,.67,.3,1.5);}
+.home-char-img{height:190px;width:auto;max-width:90%;object-fit:contain;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 6px 14px rgba(100,70,50,.18));display:block;}
+.home-char-avatar{font-size:9rem;line-height:1;animation:float 3s ease-in-out infinite;display:block;padding-bottom:4px;}
+.home-char-info{padding:14px 16px 16px;text-align:center;}
+.home-char-name{font-family:'Indie Flower',cursive;font-size:1.3rem;color:var(--text);margin-bottom:2px;}
+.home-char-class{font-size:0.75rem;color:var(--text2);}
+.home-char-speech{background:var(--bg3);border:1px solid var(--border);border-radius:12px 12px 12px 2px;padding:10px 14px;font-size:0.82rem;color:var(--text2);margin-top:10px;text-align:left;position:relative;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;}
+.stat-val{font-family:'Indie Flower',cursive;font-size:1.3rem;font-weight:700;}
+.stat-lbl{font-size:0.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.7px;margin-top:2px;}
+
+.pity-bars{margin-top:4px;}
+.pity-row{margin-bottom:8px;}
+.pity-label{font-size:0.72rem;color:var(--text2);display:flex;justify-content:space-between;margin-bottom:3px;}
+.pity-track{height:8px;background:var(--bg3);border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+.pity-fill{height:100%;border-radius:10px;transition:width .5s;}
+.pity-fill.leg{background:linear-gradient(90deg,var(--c-legendary),#E8B840);}
+.pity-fill.myth{background:linear-gradient(90deg,var(--c-mythic),#FF8AB0);}
+
+/* TASK PAGE */
+.task-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.task-need{font-size:0.78rem;color:var(--text2);background:var(--bg3);border-radius:20px;padding:4px 12px;border:1px solid var(--border);}
+.task-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;transition:all .2s;cursor:pointer;}
+.task-item.done{border-color:var(--green);background:rgba(143,174,139,.1);}
+.task-item.bonus-done{border-color:var(--gold);background:rgba(196,147,90,.08);}
+.task-icon{font-size:1.5rem;flex-shrink:0;}
+.task-info{flex:1;}
+.task-name{font-family:'Indie Flower',cursive;font-size:0.95rem;color:var(--text);}
+.task-desc{font-size:0.7rem;color:var(--text2);margin-top:2px;}
+.task-cat{font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+.task-cat.exercise{background:rgba(143,174,139,.2);color:#4A7A46;}
+.task-cat.cook{background:rgba(196,147,90,.2);color:#8A5A20;}
+.task-cat.photo{background:rgba(151,179,174,.2);color:#3A7070;}
+.task-cat.work{background:rgba(212,133,122,.2);color:#8A3A30;}
+.task-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:transparent;background:var(--bg);transition:all .2s;}
+.task-item.done .task-check,.task-item.bonus-done .task-check{background:var(--green);border-color:var(--green);color:#fff;}
+.task-refresh-btn{flex-shrink:0;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;width:30px;height:30px;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.task-refresh-btn:hover:not(.disabled){background:var(--card2);border-color:var(--teal);transform:rotate(20deg);}
+.task-refresh-btn.disabled{opacity:0.35;cursor:not-allowed;}
+.task-progress{display:flex;gap:4px;margin-bottom:12px;}
+.tp-pip{flex:1;height:5px;border-radius:10px;background:var(--border);transition:background .3s;}
+.tp-pip.req-done{background:var(--green);}
+.tp-pip.bonus-done{background:var(--gold);}
+
+/* CHARACTER PAGE */
+.char-display{text-align:center;padding:0 0 12px;}
+.char-img-zone{background:var(--zone-bg,linear-gradient(170deg,#EDE5DC 0%,#F5EEE6 60%,#EAE0D6 100%));border-radius:12px;display:flex;align-items:flex-end;justify-content:center;min-height:200px;padding-top:16px;margin-bottom:12px;overflow:hidden;cursor:pointer;}
+@keyframes pers-fall{
+  0%  {opacity:0;transform:translateY(0) scale(.7) rotate(var(--er));}
+  8%  {opacity:1;transform:translateY(12px) scale(1.1) rotate(calc(var(--er)*-1));}
+  85% {opacity:.9;}
+  100%{opacity:0;transform:translateY(var(--fd)) scale(.85) rotate(var(--er));}
+}
+.pers-fall-emoji{position:fixed;font-size:1.8rem;pointer-events:none;z-index:9999;
+  animation:pers-fall var(--dur) ease-in forwards;animation-delay:var(--delay);}
+#char-avatar-wrap{display:flex;align-items:flex-end;justify-content:center;width:100%;}
+.char-big-avatar{font-size:8rem;display:block;animation:float 3s ease-in-out infinite;padding-bottom:4px;}
+.char-big-name{font-family:'Indie Flower',cursive;font-size:1.5rem;color:var(--text);}
+.char-speech-bubble{background:var(--card2);border:1.5px solid var(--border);border-radius:16px 16px 16px 4px;padding:14px 16px;font-size:0.85rem;color:var(--text2);margin:12px 0;font-style:italic;text-align:left;line-height:1.5;}
+.pulls-info{display:flex;gap:10px;margin-bottom:14px;}
+.pull-stat{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.pull-stat-val{font-family:'Indie Flower',cursive;font-size:1.4rem;color:var(--teal2);}
+.pull-stat-lbl{font-size:0.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;}
+.rates-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;}
+.rate-chip{border-radius:8px;padding:5px 4px;text-align:center;border:1px solid transparent;}
+.rate-chip .rc-tier{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.rate-chip .rc-val{font-family:'Indie Flower',cursive;font-size:0.95rem;}
+
+/* SHOP */
+.shop-tabs{display:flex;gap:0;margin-bottom:14px;background:var(--bg3);border-radius:10px;padding:3px;border:1px solid var(--border);}
+.shop-tab{flex:1;padding:7px;text-align:center;border-radius:8px;cursor:pointer;font-size:0.78rem;font-weight:700;transition:all .2s;border:none;background:none;font-family:'Comic Neue',sans-serif;color:var(--text2);}
+.shop-tab.active{background:var(--card);color:var(--teal2);box-shadow:var(--shadow);}
+.shop-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.shop-item-oos{opacity:0.55;}
+.shop-item-icon{font-size:1.8rem;flex-shrink:0;}
+.shop-item-info{flex:1;}
+.shop-item-name{font-family:'Indie Flower',cursive;font-size:0.95rem;color:var(--text);}
+.shop-item-desc{font-size:0.7rem;color:var(--text2);margin-top:2px;}
+.currency-badge{font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:20px;}
+.cur-sticker{background:rgba(151,179,174,.2);color:var(--teal2);}
+.cur-points{background:rgba(196,147,90,.2);color:#8A5A20;}
+
+/* INVENTORY */
+.inv-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.inv-item{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;transition:all .2s;position:relative;}
+.inv-item.equipped{border-color:var(--teal);}
+.inv-item-icon{font-size:2rem;display:block;margin-bottom:4px;}
+.inv-item-name{font-family:'Indie Flower',cursive;font-size:0.85rem;color:var(--text);display:block;}
+.inv-item-tier{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.inv-item-desc{font-size:0.65rem;color:var(--text3);margin:4px 0 6px;}
+.tier-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
+.equipped-badge{position:absolute;top:6px;right:6px;font-size:0.55rem;font-weight:700;background:var(--teal);color:#fff;padding:2px 6px;border-radius:10px;text-transform:uppercase;}
+
+/* PULL OVERLAY */
+#pull-overlay{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;cursor:pointer;}
+#pull-overlay .pull-bg{position:absolute;inset:0;transition:background .3s;}
+#pull-overlay .pull-content{position:relative;text-align:center;z-index:1;}
+.pull-question{font-size:5rem;animation:qshake 0.5s ease infinite;}
+.pull-item-emoji{font-size:5.5rem;animation:popIn .4s cubic-bezier(.17,.67,.3,1.33);}
+.pull-tier-name{font-family:'Indie Flower',cursive;font-size:1.1rem;font-weight:700;margin-top:8px;padding:4px 16px;border-radius:20px;display:inline-block;}
+.pull-item-name{font-family:'Indie Flower',cursive;font-size:1.6rem;margin:8px 0 4px;}
+.pull-item-desc{font-size:0.85rem;max-width:280px;margin:0 auto 16px;opacity:.85;}
+.pull-tap{font-size:0.75rem;opacity:.6;margin-top:16px;animation:blink 1.5s ease-in-out infinite;}
+@keyframes qshake{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+@keyframes popIn{0%{transform:scale(0);opacity:0;}100%{transform:scale(1);opacity:1;}}
+@keyframes blink{0%,100%{opacity:.4;}50%{opacity:.9;}}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+
+/* TOAST */
+#toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 18px;border-radius:30px;font-size:0.8rem;font-weight:700;box-shadow:var(--shadow);opacity:0;transition:opacity .3s;pointer-events:none;z-index:150;white-space:nowrap;}
+#toast.show{opacity:1;}
+
+/* TIER COLORS */
+.tier-common{color:var(--c-common);}
+.tier-uncommon{color:var(--c-uncommon);}
+.tier-rare{color:var(--c-rare);}
+.tier-epic{color:var(--c-epic);}
+.tier-legendary{color:var(--c-legendary);}
+.tier-mythic{color:var(--c-mythic);}
+.bg-common{background:#F5F5F5;color:#555;}
+.bg-uncommon{background:#E8F5E8;color:#2E6E2B;}
+.bg-rare{background:#E3F0FA;color:#1A5A90;}
+.bg-epic{background:#F0E8FA;color:#5A1A90;}
+.bg-legendary{background:#FFF5E0;color:#8A5A00;}
+.bg-mythic{background:#FFE8F0;color:#8A0050;}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+/* ── LEADERBOARD ──────────────────────────────────────────── */
+.lb-open-btn{background:linear-gradient(135deg,var(--gold),#A86830);color:#fff8f0;border:none;border-radius:8px;padding:4px 9px;font-size:0.85rem;cursor:pointer;line-height:1;transition:opacity .15s;}
+.lb-open-btn:hover{opacity:.85;}
+#lb-panel{position:fixed;inset:0;z-index:500;}
+.lb-backdrop{position:absolute;inset:0;background:rgba(61,43,31,.45);backdrop-filter:blur(2px);}
+.lb-drawer{position:absolute;top:0;right:0;bottom:0;width:min(300px,92vw);background:var(--card);display:flex;flex-direction:column;box-shadow:-6px 0 28px rgba(100,70,50,.18);animation:slideInRight .25s ease;}
+@keyframes slideInRight{from{transform:translateX(100%);}to{transform:translateX(0);}}
+.lb-header{padding:16px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.lb-title{font-family:'Indie Flower',cursive;font-size:1.2rem;color:var(--text);}
+.lb-close-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:0.85rem;cursor:pointer;color:var(--text2);line-height:1;}
+.lb-tabs{display:flex;padding:0 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.lb-tab{flex:1;padding:10px 4px;background:none;border:none;border-bottom:2.5px solid transparent;cursor:pointer;font-size:0.72rem;font-weight:700;color:var(--text3);transition:all .15s;font-family:'Comic Neue',sans-serif;margin-bottom:-1px;}
+.lb-tab.active{color:var(--teal2);border-bottom-color:var(--teal2);}
+#lb-list{flex:1;overflow-y:auto;padding:12px;}
+.lb-entry{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;margin-bottom:7px;border:1.5px solid var(--border);background:var(--bg3);}
+.lb-entry.me{border-color:var(--teal);background:rgba(151,179,174,.12);}
+.lb-rank{font-size:1.1rem;min-width:28px;text-align:center;flex-shrink:0;font-family:'Indie Flower',cursive;}
+.lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;overflow:hidden;flex-shrink:0;}
+.lb-avatar img{width:100%;height:100%;object-fit:contain;}
+.lb-info{flex:1;min-width:0;}
+.lb-name{font-family:'Indie Flower',cursive;font-size:0.92rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lb-sub{font-size:0.62rem;color:var(--text3);margin-top:1px;}
+.lb-score{font-family:'Indie Flower',cursive;font-size:1rem;font-weight:700;color:var(--teal2);text-align:right;flex-shrink:0;}
+.lb-empty{text-align:center;padding:32px 16px;color:var(--text3);font-size:0.82rem;line-height:1.6;}
+.lb-footer{font-size:0.62rem;color:var(--text3);text-align:center;padding:10px 14px 16px;border-top:1px solid var(--border);flex-shrink:0;}
+
+/* ── ACCESSORIES ──────────────────────────────────────────── */
+.acc-title-display{font-family:'Indie Flower',cursive;font-size:0.78rem;color:var(--teal2);font-style:italic;text-align:center;margin-top:2px;min-height:1em;}
+.acc-slot-section{margin-bottom:14px;}
+.acc-slot-header{font-family:'Indie Flower',cursive;font-size:0.85rem;color:var(--text2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.acc-slot-tag{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:3px;}
+.acc-slot-tag.title{background:rgba(154,109,212,.15);color:#7040B0;}
+.acc-slot-tag.bg{background:rgba(151,179,174,.2);color:var(--teal2);}
+.acc-slot-tag.frame{background:rgba(196,147,90,.18);color:var(--gold);}
+.acc-slot-tag.aura{background:rgba(212,133,122,.18);color:var(--rose);}
+.acc-slot-tag.badge{background:rgba(143,174,139,.2);color:var(--green);}
+.acc-owned-badge{position:absolute;top:6px;right:6px;font-size:0.52rem;font-weight:700;background:var(--teal);color:#fff;padding:2px 6px;border-radius:10px;text-transform:uppercase;}
+.inv-section-title{font-family:'Indie Flower',cursive;font-size:0.85rem;color:var(--text3);margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
+.acc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.acc-item{background:var(--card);border:2px solid var(--border);border-radius:var(--r);padding:12px;text-align:center;position:relative;transition:all .2s;}
+.acc-item.equipped{border-color:var(--teal);background:rgba(151,179,174,.08);}
+.acc-equipped-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px;}
+.acc-eq-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.acc-eq-chip{display:inline-flex;align-items:center;gap:4px;background:var(--card);border:1px solid var(--teal);color:var(--teal2);border-radius:20px;padding:3px 10px;font-size:0.7rem;cursor:pointer;}
+.acc-eq-chip:hover{background:rgba(212,133,122,.1);border-color:var(--rose);color:var(--rose);}
+
+/* ── THEME PICKER ─────────────────────────────────────────── */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+.theme-btn{background:var(--card);border:2.5px solid var(--border);border-radius:14px;padding:14px 6px 10px;cursor:pointer;text-align:center;transition:all .2s;}
+.theme-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(100,70,50,.12);}
+.theme-btn.sel{border-color:var(--teal2);box-shadow:0 0 0 3px rgba(151,179,174,.25);}
+.theme-swatch{width:46px;height:46px;border-radius:50%;margin:0 auto 8px;border:2.5px solid rgba(0,0,0,.1);}
+.theme-name{font-family:'Indie Flower',cursive;font-size:0.78rem;color:var(--text);line-height:1.3;}
+
+/* ── DAILY QUOTE ──────────────────────────────────────────── */
+.daily-quote-card{background:linear-gradient(135deg,#F5EEE7,#EDE5DC);border:1.5px solid var(--border);text-align:center;padding:18px 18px 14px;}
+.daily-quote-icon{font-size:1.4rem;margin-bottom:8px;}
+.daily-quote-text{font-family:'Indie Flower',cursive;font-size:1rem;color:var(--text);line-height:1.55;margin-bottom:12px;min-height:3rem;}
+.daily-quote-pip-row{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;}
+.dq-pip{width:6px;height:6px;border-radius:50%;background:var(--border);transition:background .3s;}
+.dq-pip.active{background:var(--teal2);}
+
+/* ── VERIFY MODAL ──────────────────────────────────────────── */
+#verify-overlay{position:fixed;inset:0;z-index:250;background:rgba(61,43,31,.6);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;}
+.verify-sheet{background:var(--card);border-radius:24px 24px 0 0;width:100%;max-width:480px;padding:22px 18px 38px;animation:slideUp .3s ease;max-height:90vh;overflow-y:auto;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.verify-title{font-family:'Indie Flower',cursive;font-size:1.2rem;color:var(--text);text-align:center;margin-bottom:3px;}
+.verify-task-desc{font-size:0.75rem;color:var(--text2);text-align:center;margin-bottom:16px;}
+.verify-section{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:13px;margin-bottom:12px;}
+.verify-section-title{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:10px;}
+.timer-display{font-family:'Indie Flower',cursive;font-size:3.2rem;color:var(--teal2);text-align:center;letter-spacing:3px;line-height:1.1;}
+.timer-bar-track{height:9px;background:var(--bg);border-radius:10px;border:1px solid var(--border);overflow:hidden;margin:8px 0;}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:10px;transition:width .8s linear;}
+.verify-done-badge{display:inline-block;background:var(--green);color:#fff;border-radius:20px;padding:3px 12px;font-size:0.72rem;font-weight:700;}
+.camera-preview{width:100%;aspect-ratio:4/3;background:#1a1a1a;border-radius:10px;object-fit:cover;display:block;}
+.photo-thumb{width:100%;aspect-ratio:4/3;border-radius:10px;object-fit:cover;border:2px solid var(--green);}
+.cam-status-text{font-size:0.73rem;color:var(--text3);margin-bottom:8px;}
+
+/* ── SHOP DEALER ──────────────────────────────────────────── */
+.dealer-scene{margin-bottom:14px;border-radius:16px;border:1.5px solid var(--border);overflow:hidden;background:linear-gradient(170deg,#EDE5DC 0%,#F0EAE0 100%);position:relative;}
+.dealer-speech-row{padding:12px 16px 0;text-align:center;}
+.dealer-speech-bubble{display:inline-block;background:var(--card);border:1.5px solid var(--border);border-radius:16px 16px 16px 4px;padding:7px 14px;font-size:0.78rem;color:var(--text2);font-style:italic;position:relative;}
+.dealer-speech-bubble::after{content:'';position:absolute;bottom:-9px;left:20px;border:5px solid transparent;border-top-color:var(--border);}
+.dealer-speech-bubble::before{content:'';position:absolute;bottom:-6px;left:21px;border:4px solid transparent;border-top-color:var(--card);z-index:1;}
+.dealer-svg-wrap{display:flex;justify-content:center;align-items:flex-end;padding-top:8px;}
+.dealer-svg-wrap svg{width:100%;max-width:340px;height:auto;display:block;}
+
+/* ── PULL TICKETS ─────────────────────────────────────────── */
+.tickets-section{margin-bottom:4px;}
+.tickets-label{font-family:'Indie Flower',cursive;font-size:0.85rem;color:var(--text3);margin-bottom:8px;}
+.ticket-list{display:flex;flex-direction:column;gap:8px;}
+.ticket{display:flex;align-items:stretch;background:linear-gradient(90deg,#FFFDF9 0%,#FDFAF7 100%);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;position:relative;cursor:pointer;transition:transform .15s,box-shadow .15s;user-select:none;}
+.ticket:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(100,70,50,.12);}
+.ticket:active{transform:scale(.98);}
+.ticket.no-cursor{cursor:default;}
+.ticket.no-cursor:hover{transform:none;box-shadow:none;}
+.ticket-stripe{width:13px;flex-shrink:0;background:linear-gradient(180deg,var(--teal),var(--teal2));}
+.ticket-stripe.gold{background:linear-gradient(180deg,var(--gold),#A86830);}
+.ticket-stripe.rose{background:linear-gradient(180deg,var(--rose),#B0554A);}
+.ticket-stripe.gray{background:linear-gradient(180deg,#C0B0A0,#A09080);}
+.ticket-body{padding:10px 10px 10px 12px;flex:1;min-width:0;}
+.ticket-header{font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:2px;}
+.ticket-title{font-family:'Indie Flower',cursive;font-size:0.95rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ticket-sub{font-size:0.63rem;color:var(--text2);margin-top:2px;}
+.ticket-perf{position:absolute;right:56px;top:0;bottom:0;width:1px;border-right:2px dashed var(--border);}
+.ticket-right{width:56px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.ticket-right-icon{font-size:1.5rem;}
+.ticket-right-label{font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);}
+.ticket-stamp-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;}
+.ticket-stamp{width:58px;height:58px;border-radius:50%;border:2.5px solid var(--rose);color:var(--rose);font-size:0.48rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;opacity:0;transform:rotate(-22deg) scale(.4);transition:opacity .25s,transform .25s;background:rgba(212,133,122,.06);}
+.ticket-stamp.visible{opacity:1;transform:rotate(-22deg) scale(1);}
+.ticket-dim{opacity:.55;}
+.ticket-empty-msg{text-align:center;padding:14px 10px;color:var(--text3);font-size:0.8rem;background:var(--bg3);border-radius:10px;border:1px dashed var(--border);}
+/* ACCOUNT SELECT */
+.acct-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .15s;}
+.acct-card:hover{border-color:var(--teal);transform:translateY(-1px);box-shadow:0 4px 14px rgba(100,70,50,.12);}
+.acct-card-avatar{font-size:2.2rem;width:48px;text-align:center;flex-shrink:0;}
+.acct-card-info{flex:1;}
+.acct-card-name{font-family:'Indie Flower',cursive;font-size:1rem;color:var(--text);}
+.acct-card-sub{font-size:0.68rem;color:var(--text2);margin-top:2px;}
+.acct-card-arrow{font-size:1.1rem;color:var(--teal2);}
+</style>
+</head>
+<body>
+
+<!-- CHARACTER CREATION -->
+<div id="create-overlay">
+  <h1>✨ Daily Quest</h1>
+  <p class="sub" id="create-sub">Create your companion to begin your adventure</p>
+
+  <!-- Account select screen -->
+  <div id="acct-select-screen" class="hidden" style="width:100%;max-width:380px;">
+    <div id="acct-list"></div>
+    <div style="text-align:center;margin:14px 0 4px;font-size:0.72rem;color:var(--text3);">— or —</div>
+    <button class="btn btn-outline" onclick="startNewCreate()" style="width:100%;margin-bottom:8px;">✨ Create New Companion</button>
+    <button class="btn btn-outline" onclick="openLoginPage()" style="width:100%;">↩ Log into Account by Name</button>
+  </div>
+
+  <!-- Login-by-name search screen -->
+  <div id="login-search-screen" class="hidden" style="width:100%;max-width:380px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <button onclick="backToAccountSelect()" style="background:none;border:none;cursor:pointer;font-size:1.4rem;color:var(--teal2);padding:0;line-height:1;">←</button>
+      <span style="font-family:'Indie Flower',cursive;font-size:1.05rem;color:var(--text);">Log into Existing Account</span>
+    </div>
+    <label class="create-label" style="margin-bottom:8px;">Type your character's name</label>
+    <input class="create-input" id="login-search-input" placeholder="e.g. Luna, Ember, Sage..." maxlength="20" oninput="searchAccountByName()">
+    <div id="login-search-results" style="margin-top:12px;"></div>
+    <div id="login-search-empty" style="display:none;text-align:center;padding:20px;color:var(--text3);font-size:0.82rem;">❌ No account found with that name.</div>
+  </div>
+
+  <!-- Creation form (steps) -->
+  <div id="create-form-body" style="width:100%;max-width:380px;">
+  <div class="step-dots">
+    <div class="dot active" id="dot-0"></div>
+    <div class="dot" id="dot-1"></div>
+    <div class="dot" id="dot-2"></div>
+    <div class="dot" id="dot-3"></div>
+    <div class="dot" id="dot-4"></div>
+  </div>
+
+  <!-- Step 0: Name -->
+  <div class="create-step" id="cstep-0">
+    <label class="create-label">What's your companion's name?</label>
+    <input class="create-input" id="char-name-input" placeholder="e.g. Luna, Ember, Sage..." maxlength="20" oninput="checkNameAvailable()">
+    <div id="name-warning" style="display:none;background:#FDE8E8;border:1.5px solid #E07070;border-radius:10px;padding:8px 12px;font-size:0.78rem;color:#A03030;margin-bottom:8px;text-align:center;">
+      ⚠️ That name is already taken — try a different one!
+    </div>
+    <div id="login-warning" style="display:none;background:#FDE8E8;border:1.5px solid #E07070;border-radius:10px;padding:8px 12px;font-size:0.78rem;color:#A03030;margin-bottom:8px;text-align:center;">
+      ❌ No account found with that name.
+    </div>
+    <button class="btn btn-teal" onclick="nextStep(1)">Continue →</button>
+    <button class="btn btn-outline" onclick="openLoginPage()" style="margin-top:8px;">↩ Log into Existing Account</button>
+  </div>
+
+  <!-- Step 1: Gender -->
+  <div class="create-step hidden" id="cstep-1">
+    <label class="create-label">What is your companion's gender?</label>
+    <div class="gender-grid" id="gender-grid">
+      <div class="gender-btn" data-gender="male"    onclick="pickGender('male')">
+        <div class="g-icon">🗡️</div>
+        <div class="g-name">Male</div>
+      </div>
+      <div class="gender-btn" data-gender="female"  onclick="pickGender('female')">
+        <div class="g-icon">🌸</div>
+        <div class="g-name">Female</div>
+      </div>
+      <div class="gender-btn" data-gender="neutral" onclick="pickGender('neutral')">
+        <div class="g-icon">✨</div>
+        <div class="g-name">Non-binary</div>
+      </div>
+    </div>
+    <button class="btn btn-teal" onclick="nextStep(2)">Continue →</button>
+  </div>
+
+  <!-- Step 2: Avatar -->
+  <div class="create-step hidden" id="cstep-2">
+    <label class="create-label">Choose their appearance</label>
+    <div class="avatar-grid" id="avatar-grid"></div>
+    <button class="btn btn-teal" onclick="nextStep(3)">Continue →</button>
+  </div>
+
+  <!-- Step 3: Personality -->
+  <div class="create-step hidden" id="cstep-3">
+    <label class="create-label">Choose up to 3 personalities</label>
+    <div style="font-size:0.75rem;color:var(--text3);margin-bottom:10px;text-align:center;">
+      <span id="pers-count-label">0 / 3 selected</span>
+    </div>
+    <div class="pers-grid" id="pers-grid"></div>
+    <button class="btn btn-teal" id="finish-btn" onclick="nextStep(4)" disabled>Choose Your Theme →</button>
+  </div>
+
+  <!-- Step 4: Theme Color -->
+  <div class="create-step hidden" id="cstep-4">
+    <label class="create-label">Pick your theme palette</label>
+    <div style="font-size:0.75rem;color:var(--text3);margin-bottom:14px;text-align:center;">This colors the whole app — you can't change it later!</div>
+    <div class="theme-grid" id="theme-grid"></div>
+    <button class="btn btn-gold" id="begin-btn" onclick="finishCreate()">Begin Adventure ✨</button>
+  </div>
+  </div><!-- /create-form-body -->
+</div>
+
+<!-- LOGIN PAGE (full-screen) -->
+<div id="login-page" class="hidden" style="position:fixed;inset:0;background:var(--bg);z-index:700;overflow-y:auto;padding:40px 20px 60px;display:flex;flex-direction:column;align-items:center;">
+  <h1 style="font-size:1.8rem;color:var(--teal2);margin-bottom:6px;font-weight:700;text-align:center;">🔍 Find Your Account</h1>
+  <p style="font-size:0.85rem;color:var(--text2);text-align:center;margin-bottom:28px;">Type your character's name to log back in</p>
+  <div style="width:100%;max-width:380px;">
+    <input class="create-input" id="lp-name-input" placeholder="e.g. Luna, Ember, Sage..." maxlength="20" oninput="lpSearch()">
+    <div id="lp-results" style="margin-top:14px;"></div>
+    <div id="lp-not-found" style="display:none;text-align:center;padding:28px 0;">
+      <div style="font-size:2.8rem;margin-bottom:10px;">😔</div>
+      <div style="font-size:0.9rem;color:var(--text2);margin-bottom:20px;">No account found with that name.<br>Try a different name or create a new one.</div>
+      <button class="btn btn-outline" onclick="lpGoBack()">← Go Back to Start</button>
+    </div>
+    <button class="btn btn-outline" onclick="lpGoBack()" id="lp-back-btn" style="margin-top:18px;">← Go Back to Start</button>
+  </div>
+</div>
+
+<!-- VERIFY MODAL -->
+<div id="verify-overlay" class="hidden">
+  <div class="verify-sheet">
+    <div id="v-task-name" class="verify-title"></div>
+    <div id="v-task-desc" class="verify-task-desc"></div>
+
+    <!-- Timer section -->
+    <div id="v-timer-section" class="verify-section hidden">
+      <div class="verify-section-title">⏱ Timer — goal: <span id="v-timer-goal">30 min</span></div>
+      <div id="v-timer-display" class="timer-display">00:00</div>
+      <div class="timer-bar-track"><div class="timer-bar-fill" id="v-timer-bar" style="width:0%"></div></div>
+      <div id="v-timer-done" class="hidden" style="text-align:center;margin:6px 0;">
+        <span class="verify-done-badge">✓ Time's Up!</span>
+      </div>
+      <button class="btn btn-teal" id="v-timer-btn" onclick="toggleVerifyTimer()" style="margin-top:10px;">▶ Start Timer</button>
+    </div>
+
+    <!-- Camera section -->
+    <div id="v-camera-section" class="verify-section hidden">
+      <div class="verify-section-title">📸 Photo Proof</div>
+      <div id="v-cam-status" class="cam-status-text">Camera not started</div>
+      <video id="v-preview" class="camera-preview hidden" autoplay playsinline></video>
+      <canvas id="v-capture-canvas" class="hidden" style="display:none!important"></canvas>
+      <img id="v-thumb" class="photo-thumb hidden" alt="proof photo">
+      <div id="v-photo-done" class="hidden" style="text-align:center;margin:6px 0;">
+        <span class="verify-done-badge">✓ Photo Captured!</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button class="btn btn-teal" id="v-start-cam-btn" onclick="startVerifyCamera()">📷 Open Camera</button>
+        <button class="btn btn-teal hidden" id="v-capture-btn" onclick="captureVerifyPhoto()">📸 Take Photo</button>
+        <button class="btn btn-outline hidden" id="v-retake-btn" onclick="retakeVerifyPhoto()" style="width:auto;flex:0 0 auto;padding:10px 14px;">Retake</button>
+      </div>
+    </div>
+
+    <button class="btn btn-green" id="v-complete-btn" onclick="verifyComplete()" disabled style="margin-bottom:8px;">✓ Mark as Complete</button>
+    <button class="btn btn-outline" onclick="closeVerify()">Cancel</button>
+  </div>
+</div>
+
+<!-- PULL REVEAL -->
+<div id="pull-overlay" class="hidden" onclick="nextPull()">
+  <div class="pull-bg" id="pull-bg"></div>
+  <div class="pull-content" id="pull-content">
+    <div class="pull-question" id="pull-q">❓</div>
+  </div>
+</div>
+
+<!-- LEADERBOARD PANEL -->
+<div id="lb-panel" class="hidden">
+  <div class="lb-backdrop" onclick="closeLeaderboard()"></div>
+  <div class="lb-drawer">
+    <div class="lb-header">
+      <div class="lb-title">🏆 Leaderboard</div>
+      <button class="lb-close-btn" onclick="closeLeaderboard()">✕</button>
+    </div>
+    <div class="lb-tabs">
+      <button class="lb-tab active" id="lbt-stickers" onclick="lbTab('stickers')">🏷️ Stickers</button>
+      <button class="lb-tab" id="lbt-tasks"    onclick="lbTab('tasks')">✅ Tasks</button>
+      <button class="lb-tab" id="lbt-streak"   onclick="lbTab('streak')">🔥 Streak</button>
+    </div>
+    <div id="lb-list"></div>
+    <div class="lb-footer">Tracks all players who've played on this device</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+  <div id="topbar">
+    <div class="tb-stat">🔥 <span id="tb-streak">0</span></div>
+    <div class="tb-title">Daily Quest ✨</div>
+    <div class="tb-right">
+      <span class="tb-badge">🏷️ <span id="tb-stickers">0</span></span>
+      <span class="tb-badge">⭐ <span id="tb-points">0</span></span>
+      <span class="tb-music-pill hidden" id="tb-music-pill" onclick="gotoPage('settings')">🎵 Playing</span>
+      <button class="lb-open-btn" onclick="openLeaderboard()">🏆</button>
+    </div>
+  </div>
+
+  <div id="main">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-char-card">
+        <div class="home-char-img-zone" onclick="tapCharacter()" style="cursor:pointer;">
+          <div id="home-avatar-wrap"><span class="home-char-avatar">🧚</span></div>
+        </div>
+        <div class="home-char-info">
+          <div class="home-char-name" id="home-name">—</div>
+          <div class="home-char-class" id="home-class">—</div>
+          <div class="acc-title-display" id="home-acc-title"></div>
+          <div class="home-char-speech" id="home-speech">Hello!</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--gold)" id="h-streak">0</div>
+          <div class="stat-lbl">Streak</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--teal2)" id="h-stickers">0</div>
+          <div class="stat-lbl">Stickers</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" style="color:var(--green)" id="h-tasks">0</div>
+          <div class="stat-lbl">Tasks Done</div>
+        </div>
+      </div>
+
+      <div class="card daily-quote-card">
+        <div class="daily-quote-icon">✨</div>
+        <div class="daily-quote-text" id="daily-quote-text"></div>
+        <div class="daily-quote-pip-row" id="daily-quote-pips"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔮 Pity Countdown</div>
+        <div class="pity-bars">
+          <div class="pity-row">
+            <div class="pity-label">
+              <span>Guaranteed <b style="color:var(--c-legendary)">Legendary</b></span>
+              <span id="pity-leg-txt">50 pulls away</span>
+            </div>
+            <div class="pity-track"><div class="pity-fill leg" id="pity-leg-bar" style="width:0%"></div></div>
+          </div>
+          <div class="pity-row">
+            <div class="pity-label">
+              <span>Guaranteed <b style="color:var(--c-mythic)">Mythic</b></span>
+              <span id="pity-myth-txt">200 pulls away</span>
+            </div>
+            <div class="pity-track"><div class="pity-fill myth" id="pity-myth-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Today at a Glance</div>
+        <div id="home-today-summary" style="font-size:0.82rem;color:var(--text2)">No tasks completed yet today. Head to Tasks to begin!</div>
+      </div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="page" id="page-tasks">
+      <div class="task-header">
+        <div class="font-fancy" style="font-size:1.1rem;color:var(--text)">Today's Tasks</div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+          <div class="task-need" id="task-need-lbl">0 / 3 done</div>
+          <div id="task-refresh-lbl" style="font-size:0.68rem;color:var(--text3);font-weight:700;">🔄 3 refreshes left</div>
+        </div>
+      </div>
+      <div class="task-progress" id="task-pip-row"></div>
+      <div style="font-size:0.73rem;color:var(--text3);margin-bottom:10px;padding:8px 10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);">
+        ✅ Complete <b>3 tasks</b> to protect your streak · Extra tasks earn <b style="color:var(--gold)">bonus pulls</b> from your companion!
+      </div>
+      <div id="task-list"></div>
+    </div>
+
+    <!-- CHARACTER -->
+    <div class="page" id="page-character">
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div class="char-display">
+          <div class="char-img-zone" id="char-img-zone" onclick="tapCompanion()">
+            <div id="char-avatar-wrap"><span class="char-big-avatar">🧚</span></div>
+          </div>
+          <div style="padding:0 14px 4px;text-align:center;">
+            <div class="char-big-name" id="char-name-big">—</div>
+            <div class="acc-title-display" id="char-acc-title"></div>
+          </div>
+        </div>
+        <div style="padding:0 14px 14px;">
+        <div class="char-speech-bubble" id="char-speech-big">...</div>
+        <div class="pulls-info">
+          <div class="pull-stat">
+            <div class="pull-stat-val" id="pulls-avail">0</div>
+            <div class="pull-stat-lbl">Pulls Ready</div>
+          </div>
+          <div class="pull-stat">
+            <div class="pull-stat-val" id="pulls-total">0</div>
+            <div class="pull-stat-lbl">Total Pulls</div>
+          </div>
+          <div class="pull-stat">
+            <div class="pull-stat-val" id="pulls-today-done">0</div>
+            <div class="pull-stat-lbl">Tasks Today</div>
+          </div>
+        </div>
+        <div id="tickets-section"></div>
+        </div><!-- end padding div -->
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Current Drop Rates</div>
+        <div class="rates-grid" id="rates-grid"></div>
+        <div style="font-size:0.68rem;color:var(--text3);margin-top:8px;">Rates improved by equipped items in your inventory.</div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="page" id="page-shop">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div class="font-fancy" style="font-size:1.1rem;color:var(--text)">Shop</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="font-size:0.78rem;color:var(--text2)">🏷️ <b id="shop-stickers">0</b> · ⭐ <b id="shop-points">0</b></div>
+          <button id="shop-stock-refresh-btn" class="btn btn-outline btn-sm" onclick="refreshShopStock()" style="font-size:0.7rem;padding:5px 10px;">🔄 <span id="stock-refresh-lbl">3</span></button>
+        </div>
+      </div>
+
+      <!-- Dealer character -->
+      <div class="dealer-scene" onclick="tapDealer()" style="cursor:pointer;">
+        <div class="dealer-speech-row">
+          <span class="dealer-speech-bubble" id="dealer-speech">"Welcome to the café! ✨ What can I get for you today~"</span>
+        </div>
+        <div class="dealer-svg-wrap">
+          <svg viewBox="0 0 300 175" xmlns="http://www.w3.org/2000/svg">
+
+            <!-- ░░ WARM INTERIOR BACKGROUND ░░ -->
+            <rect width="300" height="175" fill="#FFF8E0"/>
+            <rect x="8" y="36" width="284" height="90" rx="3" fill="#FFFBCC" stroke="#EAD888" stroke-width="1"/>
+
+            <!-- ░░ LEFT WINDOW ░░ -->
+            <rect x="14" y="44" width="66" height="50" rx="5" fill="#FFE866" stroke="#C8A828" stroke-width="1.8"/>
+            <line x1="47" y1="44" x2="47" y2="94" stroke="#C8A828" stroke-width="1.2"/>
+            <line x1="14" y1="69" x2="80" y2="69" stroke="#C8A828" stroke-width="1.2"/>
+            <rect x="14" y="44" width="66" height="50" rx="5" fill="none" stroke="#C8A828" stroke-width="1.8"/>
+            <!-- curtain tails -->
+            <path d="M14 44 Q24 58 14 68" fill="#F8C880" opacity="0.55"/>
+            <path d="M80 44 Q70 58 80 68" fill="#F8C880" opacity="0.55"/>
+
+            <!-- ░░ RIGHT WINDOW ░░ -->
+            <rect x="220" y="44" width="66" height="50" rx="5" fill="#FFE866" stroke="#C8A828" stroke-width="1.8"/>
+            <line x1="253" y1="44" x2="253" y2="94" stroke="#C8A828" stroke-width="1.2"/>
+            <line x1="220" y1="69" x2="286" y2="69" stroke="#C8A828" stroke-width="1.2"/>
+            <rect x="220" y="44" width="66" height="50" rx="5" fill="none" stroke="#C8A828" stroke-width="1.8"/>
+            <path d="M220 44 Q230 58 220 68" fill="#F8C880" opacity="0.55"/>
+            <path d="M286 44 Q276 58 286 68" fill="#F8C880" opacity="0.55"/>
+
+            <!-- ░░ LEFT CAT — chef hat ░░ -->
+            <!-- hat brim -->
+            <rect x="107" y="59" width="30" height="8" rx="3" fill="white" stroke="#D0C0B0" stroke-width="1"/>
+            <!-- hat top -->
+            <rect x="112" y="46" width="20" height="16" rx="7" fill="white" stroke="#D0C0B0" stroke-width="1"/>
+            <!-- ears -->
+            <polygon points="107,76 112,60 121,75" fill="white" stroke="#D0C0B0" stroke-width="1.2" stroke-linejoin="round"/>
+            <polygon points="135,75 144,60 149,76" fill="white" stroke="#D0C0B0" stroke-width="1.2" stroke-linejoin="round"/>
+            <polygon points="109,74 113,63 119,73" fill="#FFCCD8" opacity="0.65"/>
+            <polygon points="137,73 141,63 147,74" fill="#FFCCD8" opacity="0.65"/>
+            <!-- head -->
+            <ellipse cx="128" cy="84" rx="24" ry="22" fill="white" stroke="#D0C0B0" stroke-width="1.3"/>
+            <!-- eyes -->
+            <circle cx="120" cy="81" r="4" fill="#3D2B1F"/>
+            <circle cx="136" cy="81" r="4" fill="#3D2B1F"/>
+            <circle cx="121" cy="79.5" r="1.5" fill="white"/>
+            <circle cx="137" cy="79.5" r="1.5" fill="white"/>
+            <!-- blush -->
+            <ellipse cx="111" cy="88" rx="9" ry="5.5" fill="#FFB8CC" opacity="0.5"/>
+            <ellipse cx="145" cy="88" rx="9" ry="5.5" fill="#FFB8CC" opacity="0.5"/>
+            <!-- nose -->
+            <ellipse cx="128" cy="88" rx="2.8" ry="2" fill="#FFB8CC"/>
+            <!-- mouth -->
+            <path d="M123 92 Q128 97 133 92" stroke="#D0C0B0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <!-- paws on counter -->
+            <ellipse cx="115" cy="115" rx="12" ry="8" fill="white" stroke="#D0C0B0" stroke-width="1"/>
+            <ellipse cx="141" cy="115" rx="12" ry="8" fill="white" stroke="#D0C0B0" stroke-width="1"/>
+
+            <!-- ░░ RIGHT CAT — happy squint eyes ░░ -->
+            <!-- ears -->
+            <polygon points="163,83 169,67 177,82" fill="white" stroke="#D0C0B0" stroke-width="1.2" stroke-linejoin="round"/>
+            <polygon points="183,82 191,67 197,83" fill="white" stroke="#D0C0B0" stroke-width="1.2" stroke-linejoin="round"/>
+            <polygon points="165,81 169,70 175,80" fill="#FFCCD8" opacity="0.65"/>
+            <polygon points="185,80 189,70 195,81" fill="#FFCCD8" opacity="0.65"/>
+            <!-- head -->
+            <ellipse cx="180" cy="91" rx="21" ry="20" fill="white" stroke="#D0C0B0" stroke-width="1.3"/>
+            <!-- happy curved eyes -->
+            <path d="M171 88 Q176 84 181 88" stroke="#3D2B1F" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M179 88 Q184 84 189 88" stroke="#3D2B1F" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- blush -->
+            <ellipse cx="164" cy="96" rx="8" ry="5" fill="#FFB8CC" opacity="0.5"/>
+            <ellipse cx="196" cy="96" rx="8" ry="5" fill="#FFB8CC" opacity="0.5"/>
+            <!-- nose -->
+            <ellipse cx="180" cy="95" rx="2.5" ry="1.8" fill="#FFB8CC"/>
+            <!-- mouth -->
+            <path d="M176 99 Q180 104 184 99" stroke="#D0C0B0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <!-- paw peeking up -->
+            <ellipse cx="180" cy="115" rx="14" ry="8" fill="white" stroke="#D0C0B0" stroke-width="1"/>
+
+            <!-- ░░ STONE COUNTER ░░ -->
+            <!-- ledge top -->
+            <rect x="0" y="118" width="300" height="9" fill="#F2E4C4" stroke="#C8A870" stroke-width="1.5"/>
+            <!-- stone body -->
+            <rect x="0" y="127" width="300" height="48" fill="#EAD8B0"/>
+            <!-- row 1 stones -->
+            <rect x="3"   y="129" width="56" height="17" rx="5" fill="#F4E8D0" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="63"  y="129" width="48" height="17" rx="5" fill="#F0E2C6" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="115" y="129" width="58" height="17" rx="5" fill="#F4E8D0" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="177" y="129" width="52" height="17" rx="5" fill="#F0E2C6" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="233" y="129" width="64" height="17" rx="5" fill="#F4E8D0" stroke="#C8B88A" stroke-width="0.9"/>
+            <!-- row 2 stones -->
+            <rect x="3"   y="149" width="70" height="17" rx="5" fill="#F0E2C6" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="77"  y="149" width="52" height="17" rx="5" fill="#F4E8D0" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="133" y="149" width="46" height="17" rx="5" fill="#F0E2C6" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="183" y="149" width="62" height="17" rx="5" fill="#F4E8D0" stroke="#C8B88A" stroke-width="0.9"/>
+            <rect x="249" y="149" width="48" height="17" rx="5" fill="#F0E2C6" stroke="#C8B88A" stroke-width="0.9"/>
+
+            <!-- ░░ PRODUCE BASKET ░░ -->
+            <!-- basket body -->
+            <rect x="32" y="112" width="46" height="14" rx="6" fill="#D89838" stroke="#A07020" stroke-width="1.2"/>
+            <ellipse cx="55" cy="126" rx="23" ry="11" fill="#C88030" stroke="#A07020" stroke-width="1.2"/>
+            <!-- weave -->
+            <line x1="42" y1="112" x2="42" y2="126" stroke="#A07020" stroke-width="0.7" opacity="0.4"/>
+            <line x1="52" y1="112" x2="52" y2="126" stroke="#A07020" stroke-width="0.7" opacity="0.4"/>
+            <line x1="62" y1="112" x2="62" y2="126" stroke="#A07020" stroke-width="0.7" opacity="0.4"/>
+            <line x1="72" y1="112" x2="72" y2="126" stroke="#A07020" stroke-width="0.7" opacity="0.4"/>
+            <line x1="32" y1="119" x2="78" y2="119" stroke="#A07020" stroke-width="0.7" opacity="0.4"/>
+            <!-- handle -->
+            <path d="M36 115 Q55 104 74 115" stroke="#A07020" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+            <!-- fruit -->
+            <circle cx="46" cy="111" r="5.5" fill="#E84838"/>
+            <circle cx="57" cy="108" r="6"   fill="#F0A028"/>
+            <circle cx="67" cy="110" r="5"   fill="#78C030"/>
+            <circle cx="52" cy="105" r="4.5" fill="#E84838"/>
+            <line x1="57" y1="102" x2="59" y2="106" stroke="#508018" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="46" y1="105" x2="47" y2="108" stroke="#508018" stroke-width="1.2" stroke-linecap="round"/>
+
+            <!-- ░░ TEAL AWNING ░░ -->
+            <rect x="0" y="0" width="300" height="36" fill="#6BBFBF"/>
+            <!-- awning stripe lines -->
+            <line x1="0" y1="12" x2="300" y2="12" stroke="#5AACAC" stroke-width="1" opacity="0.45"/>
+            <line x1="0" y1="24" x2="300" y2="24" stroke="#5AACAC" stroke-width="1" opacity="0.45"/>
+            <!-- scalloped bottom -->
+            <path d="M0 36 Q12 47 24 36 Q36 47 48 36 Q60 47 72 36 Q84 47 96 36 Q108 47 120 36 Q132 47 144 36 Q156 47 168 36 Q180 47 192 36 Q204 47 216 36 Q228 47 240 36 Q252 47 264 36 Q276 47 288 36 Q294 42 300 36 L300 36 L0 36 Z" fill="#6BBFBF"/>
+            <path d="M0 36 Q12 47 24 36 Q36 47 48 36 Q60 47 72 36 Q84 47 96 36 Q108 47 120 36 Q132 47 144 36 Q156 47 168 36 Q180 47 192 36 Q204 47 216 36 Q228 47 240 36 Q252 47 264 36 Q276 47 288 36" fill="none" stroke="#5AACAC" stroke-width="1.8"/>
+
+            <!-- ░░ HANGING CAFÉ SIGN ░░ -->
+            <line x1="133" y1="36" x2="133" y2="42" stroke="#C8A830" stroke-width="1.5"/>
+            <line x1="167" y1="36" x2="167" y2="42" stroke="#C8A830" stroke-width="1.5"/>
+            <rect x="116" y="42" width="68" height="24" rx="7" fill="#FFF8E0" stroke="#C8A830" stroke-width="1.8"/>
+            <text x="150" y="52" text-anchor="middle" font-family="Georgia,serif" font-size="9" fill="#8A5820" font-weight="bold" letter-spacing="1">✿ Café ✿</text>
+            <text x="150" y="62" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#B08040">for the heart</text>
+
+            <!-- ░░ TINY SPARKLES ░░ -->
+            <circle cx="93" cy="60" r="1.5" fill="#FFD060" opacity="0.7"/>
+            <circle cx="207" cy="58" r="1.5" fill="#FFD060" opacity="0.7"/>
+            <circle cx="100" cy="72" r="1" fill="#FFD060" opacity="0.5"/>
+            <circle cx="200" cy="70" r="1" fill="#FFD060" opacity="0.5"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="shop-tabs">
+        <button class="shop-tab active" id="stab-sticker" onclick="shopTab('sticker')">🏷️ Sticker Shop</button>
+        <button class="shop-tab" id="stab-daily" onclick="shopTab('daily')">⭐ Daily Shop</button>
+      </div>
+      <div id="sticker-shop-content"></div>
+      <div id="daily-shop-content" class="hidden"></div>
+    </div>
+
+    <!-- INVENTORY -->
+    <div class="page" id="page-inventory">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div class="font-fancy" style="font-size:1.1rem">My Items</div>
+        <div style="font-size:0.72rem;color:var(--text3)">Equip up to 3 for passive bonuses</div>
+      </div>
+      <div id="inv-grid" class="inv-grid"></div>
+      <div id="inv-empty" class="hidden" style="text-align:center;padding:32px 16px;color:var(--text3);">
+        <div style="font-size:2.5rem;margin-bottom:8px;">🎒</div>
+        <div style="font-size:0.85rem;">No items yet! Complete tasks to earn pulls from your companion.</div>
+      </div>
+      <div id="acc-section" class="hidden">
+        <div class="inv-section-title">✨ Accessories <span style="font-size:0.65rem;color:var(--text3);font-family:'Comic Neue',sans-serif;font-style:italic;">· one per slot</span></div>
+        <div id="acc-grid" class="acc-grid"></div>
+      </div>
+      <div id="acc-empty" class="hidden" style="text-align:center;padding:20px 16px;color:var(--text3);font-size:0.8rem;background:var(--bg3);border-radius:10px;border:1px dashed var(--border);margin-top:12px;">
+        🎨 No accessories yet! Unlock them in the Daily Shop with streak points.
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="font-fancy" style="font-size:1.1rem;margin-bottom:14px;">⚙️ Settings</div>
+
+      <div class="card">
+        <div class="card-title">Your Companion</div>
+        <div id="settings-char-preview" style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+          <div id="settings-avatar-wrap" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:3rem;"></div>
+          <div>
+            <div id="settings-char-name" style="font-family:'Indie Flower',cursive;font-size:1.1rem;"></div>
+            <div id="settings-char-details" style="font-size:0.75rem;color:var(--text2);margin-top:3px;"></div>
+          </div>
+        </div>
+        <button class="btn btn-teal-light" onclick="switchAccount()" style="margin-bottom:8px;">
+          🔀 Switch Account
+        </button>
+        <button class="btn btn-rose" onclick="resetCharacter()" style="margin-bottom:8px;">
+          🔄 Reset Companion &amp; Start Over
+        </button>
+        <div id="admin-erase-wrap" style="display:none">
+          <button class="btn btn-rose" onclick="eraseNonAdminAccounts()" style="opacity:0.7;">
+            🗑️ Erase All Non-Admin Accounts
+          </button>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text3);margin-top:8px;text-align:center;">This will erase all progress, items, and streaks.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Stats</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="stat-box"><div class="stat-val" style="color:var(--gold)"  id="s-streak">0</div><div class="stat-lbl">Best Streak</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--teal2)" id="s-pulls">0</div> <div class="stat-lbl">Total Pulls</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--green)" id="s-tasks">0</div> <div class="stat-lbl">Tasks Done</div></div>
+          <div class="stat-box"><div class="stat-val" style="color:var(--rose)"  id="s-items">0</div> <div class="stat-lbl">Items Owned</div></div>
+        </div>
+      </div>
+
+      <div class="card" id="music-card">
+        <div class="card-title">🎵 Music Player</div>
+        <div style="font-size:0.72rem;color:var(--text3);margin-bottom:10px;">Play calming ambient sounds or upload your own music while questing</div>
+        <div style="font-size:0.76rem;font-weight:700;color:var(--text2);margin-bottom:6px;">Ambient Sounds</div>
+        <div class="music-track-grid" id="music-track-grid"></div>
+        <div style="font-size:0.76rem;font-weight:700;color:var(--text2);margin-bottom:6px;">Your Music</div>
+        <label class="btn btn-outline btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:6px;">
+          📁 Upload Audio File
+          <input type="file" accept="audio/*" onchange="loadUserMusic(this)" style="display:none">
+        </label>
+        <div id="music-user-name" style="font-size:0.7rem;color:var(--text3);margin-bottom:10px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <button class="btn btn-teal btn-sm" id="music-pp-btn" onclick="toggleMusic()" disabled style="min-width:80px;">▶ Play</button>
+          <div class="music-vol-row" style="flex:1;">
+            <span style="font-size:0.72rem;color:var(--text3);">🔈</span>
+            <input type="range" min="0" max="1" step="0.05" value="0.5" oninput="setMusicVolume(this.value)">
+            <span style="font-size:0.72rem;color:var(--text3);">🔊</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="notif-card">
+        <div class="card-title">🔔 Notifications</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;">
+          <div>
+            <div style="font-size:0.82rem;font-weight:700;color:var(--text);">Daily Quest Reminder</div>
+            <div style="font-size:0.72rem;color:var(--text3);margin-top:2px;">Get a reminder each time you open the app showing today's task progress</div>
+          </div>
+          <button id="notif-toggle-btn" onclick="toggleNotifications()" class="btn btn-sm" style="flex-shrink:0;min-width:76px;">Enable</button>
+        </div>
+        <div id="notif-status" style="font-size:0.72rem;color:var(--text3);margin-bottom:8px;"></div>
+        <button id="notif-test-btn" class="btn btn-outline btn-sm hidden" onclick="fireNotification(true)">🔔 Send Test Notification</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">About</div>
+        <p style="font-size:0.78rem;color:var(--text2);line-height:1.6;">
+          Complete <b>3 of 10 daily tasks</b> to keep your streak.<br>
+          Extra tasks earn more stickers and better pulls.<br>
+          Equip items from inventory to boost your drop rates.<br>
+          Spend stickers at the Sticker Shop, daily points at the Daily Shop.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <nav id="bottomnav">
+    <button class="nav-btn active" id="nav-home"      onclick="gotoPage('home')">     <span class="ni">🏠</span>Home</button>
+    <button class="nav-btn"        id="nav-tasks"     onclick="gotoPage('tasks')">    <span class="ni">📋</span>Tasks</button>
+    <button class="nav-btn"        id="nav-character" onclick="gotoPage('character')"><span class="ni">🌟</span>Companion</button>
+    <button class="nav-btn"        id="nav-shop"      onclick="gotoPage('shop')">     <span class="ni">🏪</span>Shop</button>
+    <button class="nav-btn"        id="nav-inventory" onclick="gotoPage('inventory')"><span class="ni">🎒</span>Items</button>
+    <button class="nav-btn"        id="nav-settings"  onclick="gotoPage('settings')"> <span class="ni">⚙️</span>Settings</button>
+  </nav>
+</div>
+
+<script>
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+
+function avatarHTML(avatar, cssClass) {
+  const src = getAvatarSrc(avatar, S.character.gender || 'male');
+  const isHome = cssClass === 'home-char-img';
+  const emojiFontSize = isHome ? '9rem' : '8rem';
+  if (src) {
+    const fallback = isHome ? 'home-char-avatar' : 'char-big-avatar';
+    return `<img src="${src}" class="${cssClass}" alt="${avatar}"
+      onerror="this.outerHTML='<span class=\\'${fallback}\\'>⚔️</span>'">`;
+  }
+  const spanClass = isHome ? 'home-char-avatar' : 'char-big-avatar';
+  return `<span class="${spanClass}">${avatar}</span>`;
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+// Image avatars: key → object with per-gender filenames
+// Save your images as knight-male.png / knight-female.png / knight-neutral.png
+const IMAGE_AVATARS = {
+  knight: { male: 'knight-male.png', female: 'knight-female.png', neutral: 'knight-neutral.png' },
+};
+const AVATARS = ['knight','🧚','🧙','🦊','🐉','🧝','🌸','⚔️','🦸','🐱','🌟'];
+
+function getAvatarSrc(key, gender) {
+  const map = IMAGE_AVATARS[key];
+  if (!map) return null;
+  return map[gender] || map.male;
+}
+
+const PERSONALITIES = [
+  { id:'adventurer', name:'Adventurer', icon:'⚔️', desc:'Bold & daring' },
+  { id:'mystic',     name:'Mystic',     icon:'🔮', desc:'Wise & mysterious' },
+  { id:'chef',       name:'Chef',       icon:'🍳', desc:'Warm & nurturing' },
+  { id:'artist',     name:'Artist',     icon:'🎨', desc:'Creative & whimsical' },
+  { id:'scholar',    name:'Scholar',    icon:'📚', desc:'Thoughtful & precise' },
+  { id:'nature',     name:'Nature',     icon:'🌿', desc:'Calm & grounding' },
+];
+
+const DIALOGUES = {
+  adventurer:{
+    idle:["Today's adventure awaits!","The path is yours to claim!","Ready when you are, hero!"],
+    few:["A decent start! But legends do more.","Three tasks — not bad!","Keep pushing, adventurer!"],
+    half:["Now THAT'S what I'm talking about!","Five tasks! The realm notices!","You're on fire!"],
+    most:["You're practically unstoppable!","Seven tasks?! I'm in awe!","The dungeon fears you!"],
+    all:["TEN TASKS! ABSOLUTE LEGEND!","I've never seen such dedication!","ALL HAIL THE CHAMPION!"],
+  },
+  mystic:{
+    idle:["The stars await your movement…","Destiny stirs when you act.","What does today hold?"],
+    few:["Three tasks… the crystal hums softly.","You've begun well, seeker.","The path unfolds."],
+    half:["Five tasks — the orb glows brighter!","The cosmos applauds you.","Your aura strengthens."],
+    most:["Seven tasks… extraordinary power!","The prophecy speaks of you.","Stars align for you!"],
+    all:["ALL TEN! The universe trembles!","Mythic power flows through you!","The cosmos bows!"],
+  },
+  chef:{
+    idle:["What's cooking today? 🍳","Ready to whip something up?","Let's make today delicious!"],
+    few:["Three tasks — a good appetizer!","You're warming up nicely!","The kitchen is heating up!"],
+    half:["Five tasks — now we're cooking!","You're adding great flavor today!","Almost a full meal!"],
+    most:["Seven tasks — chef's kiss! 🤌","You've mastered the recipe!","A feast of dedication!"],
+    all:["Ten tasks! Michelin star effort!","The ultimate meal is complete!","PERFECT RECIPE! 🌟"],
+  },
+  artist:{
+    idle:["What will we create today?","The canvas is blank — for now!","Inspiration is waiting!"],
+    few:["Three tasks — a nice sketch!","You've started the composition!","The colors are mixing!"],
+    half:["Five tasks — a beautiful piece!","The painting comes alive!","You're in the flow!"],
+    most:["Seven tasks — a masterpiece!","The gallery is stunned!","Your art touches souls!"],
+    all:["Ten tasks! The Louvre wants it!","MAGNUM OPUS ACHIEVED!","Standing ovation! 🎨"],
+  },
+  scholar:{
+    idle:["Knowledge awaits your pursuit.","What shall we learn today?","The library is open."],
+    few:["Three tasks — good foundation.","Data points collected.","You're on track."],
+    half:["Five tasks — solid progress!","Hypothesis confirmed!","Your discipline shows."],
+    most:["Seven tasks — remarkable!","A+ performance today!","Your dedication is noted."],
+    all:["Ten tasks — perfect score!","The highest distinction!","SUMMA CUM LAUDE! 📚"],
+  },
+  nature:{
+    idle:["The forest breathes with you.","Nature rewards the patient.","What grows today?"],
+    few:["Three tasks — like seeds sprouting.","The roots deepen.","Small steps, big trees."],
+    half:["Five tasks — the flowers bloom!","You're in full bloom!","Nature smiles with you."],
+    most:["Seven tasks — the forest sings!","The rivers celebrate you!","Mountains bow to you."],
+    all:["Ten tasks — you ARE nature!","The whole earth cheers!","Every living thing honors you! 🌿"],
+  },
+};
+
+// verify: 'timer' | 'photo' | 'both'   minTime: minutes required (0 = no minimum)
+const ALL_TASKS = [
+  {id:'walk',     cat:'exercise',icon:'🚶',name:'30-Min Walk',        desc:'Walk outside for at least 30 minutes',      verify:'timer', minTime:30},
+  {id:'run',      cat:'exercise',icon:'🏃',name:'Go for a Run',       desc:'Run any distance outside — no phone!',      verify:'timer', minTime:20},
+  {id:'workout',  cat:'exercise',icon:'🏋️',name:'Full Workout',       desc:'Exercise at home or gym for 1+ hour',       verify:'timer', minTime:60},
+  {id:'hike',     cat:'exercise',icon:'🥾',name:'Trail Hike',         desc:'Hike a trail for 45+ minutes',              verify:'timer', minTime:45},
+  {id:'bike',     cat:'exercise',icon:'🚴',name:'Bike Ride',          desc:'Ride a bike for 30+ minutes outside',       verify:'timer', minTime:30},
+  {id:'swim',     cat:'exercise',icon:'🏊',name:'Swim Session',       desc:'Swim laps or open water for 30+ min',       verify:'timer', minTime:30},
+  {id:'yoga',     cat:'exercise',icon:'🧘',name:'Yoga & Stretch',     desc:'Yoga or stretching for 30+ minutes',        verify:'timer', minTime:30},
+  {id:'dance',    cat:'exercise',icon:'💃',name:'Dance Session',      desc:'Put on music and dance for 30 min',         verify:'timer', minTime:30},
+  {id:'cook',         cat:'cook',  icon:'🍳',name:'Cook from Scratch',    desc:'Make a full meal from scratch',                  verify:'both',  minTime:20},
+  {id:'bake',         cat:'cook',  icon:'🥖',name:'Bake Something',       desc:'Bake bread, a cake, cookies, or pizza',          verify:'both',  minTime:30},
+  {id:'mealprep',     cat:'cook',  icon:'🥗',name:'Meal Prep',            desc:'Prep healthy meals for the next few days',       verify:'both',  minTime:30},
+  {id:'recipe',       cat:'cook',  icon:'📋',name:'New Recipe',           desc:'Cook a recipe you have never made before',       verify:'both',  minTime:20},
+  {id:'intl_dish',    cat:'cook',  icon:'🌍',name:'International Dish',   desc:'Cook a dish from another country or culture',    verify:'both',  minTime:30},
+  {id:'one_pot',      cat:'cook',  icon:'🥘',name:'One-Pot Meal',         desc:'Make a hearty one-pot dish from scratch',        verify:'both',  minTime:25},
+  {id:'decorate',     cat:'cook',  icon:'🧁',name:'Bake & Decorate',      desc:'Bake and decorate a sweet treat',                verify:'both',  minTime:45},
+  {id:'pack_lunch',   cat:'cook',  icon:'🍱',name:'Pack a Healthy Lunch', desc:'Prepare a nutritious packed lunch from scratch',  verify:'both',  minTime:20},
+  {id:'photo_out',    cat:'photo', icon:'📸',name:'Outside Photo Quest',  desc:'Take 5+ photos outside — leave the house!',      verify:'photo', minTime:0},
+  {id:'photo_sun',    cat:'photo', icon:'🌅',name:'Sunrise or Sunset',    desc:'Photograph a sunrise or sunset',                 verify:'photo', minTime:0},
+  {id:'photo_nature', cat:'photo', icon:'🌿',name:'Nature Close-Up',      desc:'Take detailed close-up photos of nature',        verify:'photo', minTime:0},
+  {id:'photo_food',   cat:'photo', icon:'🍽️',name:'Food Photography',    desc:'Beautifully photograph a meal you made',         verify:'photo', minTime:0},
+  {id:'photo_street', cat:'photo', icon:'📷',name:'Street Photography',   desc:'Capture candid moments and life in public',      verify:'photo', minTime:0},
+  {id:'photo_arch',   cat:'photo', icon:'🏛️',name:'Architecture Shot',   desc:'Photograph interesting buildings or structures',  verify:'photo', minTime:0},
+  {id:'photo_night',  cat:'photo', icon:'🌃',name:'Golden Hour Shoot',    desc:'Take photos during golden hour or blue hour',    verify:'photo', minTime:0},
+  {id:'photo_self',   cat:'photo', icon:'🤳',name:'Creative Self-Portrait',desc:'Take an artistic or creative self-portrait',     verify:'photo', minTime:0},
+  {id:'deep_work',    cat:'work',  icon:'💼',name:'Deep Work Block',      desc:'1+ hour of fully focused work or study',         verify:'timer', minTime:60},
+  {id:'read',         cat:'work',  icon:'📖',name:'Read Non-Fiction',     desc:'Read a book or article for 30+ minutes',         verify:'timer', minTime:30},
+  {id:'journal',      cat:'work',  icon:'✏️',name:'Write in Journal',     desc:'Write a meaningful journal entry',                verify:'timer', minTime:10},
+  {id:'learn',        cat:'work',  icon:'🎓',name:'Learn Something',      desc:'Watch a tutorial or take an online lesson',       verify:'timer', minTime:30},
+  {id:'plan',         cat:'work',  icon:'📅',name:'Weekly Planning',      desc:'Plan your week, projects, or goals',              verify:'timer', minTime:20},
+  {id:'create',       cat:'work',  icon:'🎨',name:'Create Something',     desc:'Draw, write, craft, build — make anything!',      verify:'timer', minTime:30},
+  {id:'language',     cat:'work',  icon:'🗣️',name:'Language Practice',   desc:'Study or practice a foreign language',            verify:'timer', minTime:30},
+  {id:'essay',        cat:'work',  icon:'🖊️',name:'Write an Essay',      desc:'Write a thoughtful essay, article, or story',     verify:'timer', minTime:45},
+];
+
+const TIERS = {
+  common:   {name:'Common',   color:'#888',  bg:'#F0F0F0', textColor:'#444'},
+  uncommon: {name:'Uncommon', color:'#5A9E58',bg:'#E0F0E0', textColor:'#2A6028'},
+  rare:     {name:'Rare',     color:'#4A88C4',bg:'#E0EEF8', textColor:'#184878'},
+  epic:     {name:'Epic',     color:'#8854C0',bg:'#EEE0F8', textColor:'#481878'},
+  legendary:{name:'Legendary',color:'#C48820',bg:'#F8F0D8', textColor:'#785010'},
+  mythic:   {name:'Mythic',   color:'#C04478',bg:'#F8E0EC', textColor:'#780830'},
+};
+
+const BASE_RATES = {common:.30,uncommon:.25,rare:.25,epic:.13,legendary:.06,mythic:.01};
+const PITY_LEG = 50;
+const PITY_MYTH = 200;
+
+const ITEMS = [
+  {id:'c1',tier:'common',   icon:'🪨',name:'Lucky Pebble',     desc:'A smooth pebble. +2% all drops.',      eff:{type:'dropBoost',val:.02}},
+  {id:'c2',tier:'common',   icon:'🍂',name:'Autumn Leaf',      desc:'A pressed autumn leaf. Nothing special.',eff:null},
+  {id:'c3',tier:'common',   icon:'🍵',name:'Tea Leaf',         desc:'Calming tea leaf. Use: -3 pity.',       eff:{type:'pityReduce',val:3}},
+  {id:'c4',tier:'common',   icon:'🎀',name:'Silk Ribbon',      desc:'A pretty ribbon. +1% rare+ drops.',     eff:{type:'rareBoost',val:.01}},
+  {id:'u1',tier:'uncommon', icon:'🥠',name:'Fortune Cookie',   desc:'Has a fortune! +5% all drops.',         eff:{type:'dropBoost',val:.05}},
+  {id:'u2',tier:'uncommon', icon:'🍀',name:'Four-Leaf Clover', desc:'A rare clover. +8% rare+ drops.',       eff:{type:'rareBoost',val:.08}},
+  {id:'u3',tier:'uncommon', icon:'🌿',name:'Herb Bundle',      desc:'Aromatic herbs. Use: -8 pity.',         eff:{type:'pityReduce',val:8}},
+  {id:'u4',tier:'uncommon', icon:'🪙',name:'Silver Coin',      desc:'Shiny coin. Use: +15 stickers.',        eff:{type:'stickers',val:15}},
+  {id:'r1',tier:'rare',     icon:'🔮',name:'Crystal Ball',     desc:'See the future. +12% rare+ drops.',     eff:{type:'rareBoost',val:.12}},
+  {id:'r2',tier:'rare',     icon:'🌙',name:'Moon Stone',       desc:'Glows softly. Use: -15 pity.',          eff:{type:'pityReduce',val:15}},
+  {id:'r3',tier:'rare',     icon:'🌰',name:'Golden Acorn',     desc:'Seeds of fortune. Use: +30 stickers.',  eff:{type:'stickers',val:30}},
+  {id:'r4',tier:'rare',     icon:'🦋',name:'Prismatic Wing',   desc:'A butterfly wing. +8% epic+ drops.',    eff:{type:'epicBoost',val:.08}},
+  {id:'e1',tier:'epic',     icon:'🐉',name:'Dragon Scale',     desc:'Genuine scale. +20% epic+ drops.',      eff:{type:'epicBoost',val:.20}},
+  {id:'e2',tier:'epic',     icon:'⭐',name:'Starlight Jar',    desc:'Captured starlight. Use: +60 stickers.',eff:{type:'stickers',val:60}},
+  {id:'e3',tier:'epic',     icon:'🦅',name:'Phoenix Feather',  desc:'Reborn from ash. Use: -25 pity.',       eff:{type:'pityReduce',val:25}},
+  {id:'e4',tier:'epic',     icon:'🌺',name:'Crimson Bloom',    desc:'Rare flower. +18% all drops.',          eff:{type:'dropBoost',val:.18}},
+  {id:'l1',tier:'legendary',icon:'🧭',name:'Cosmic Compass',  desc:'Points to greatness. +35% leg+ drops.', eff:{type:'legendBoost',val:.35}},
+  {id:'l2',tier:'legendary',icon:'📚',name:"Sorcerer's Tome", desc:'Ancient knowledge. Use: +100 stickers.',eff:{type:'stickers',val:100}},
+  {id:'l3',tier:'legendary',icon:'💫',name:'Star Fragment',    desc:'A fallen star. Use: halves pity.',      eff:{type:'pityHalve',val:.5}},
+  {id:'l4',tier:'legendary',icon:'🔑',name:'Fortune Key',      desc:'Unlocks luck. +25% all drops.',         eff:{type:'dropBoost',val:.25}},
+  {id:'m1',tier:'mythic',   icon:'💎',name:"Philosopher's Stone",desc:'Ultimate artifact. +50% rare+ drops.',eff:{type:'rareBoost',val:.50}},
+  {id:'m2',tier:'mythic',   icon:'⏳',name:'Time Crystal',    desc:'Bends time. Use: resets pity fully.',   eff:{type:'pityReset',val:0}},
+  {id:'m3',tier:'mythic',   icon:'🌈',name:'Aurora Stone',    desc:'Pure luck. Use: +200 stickers.',        eff:{type:'stickers',val:200}},
+  {id:'m4',tier:'mythic',   icon:'🌙',name:'Lunar Heart',     desc:'Moon\'s blessing. +60% all drops.',     eff:{type:'dropBoost',val:.60}},
+];
+
+const STICKER_SHOP = [
+  // Quick boosts (5–20 stickers)
+  {id:'ss1', icon:'🎲',name:'Extra Pull Token',   desc:'Get 1 free pull from your companion',          cost:5,   eff:{type:'pull',val:1}},
+  {id:'ss2', icon:'🍀',name:'Luck Charm',         desc:'Temporarily +5% all drop rates for 5 pulls',   cost:10,  eff:{type:'tempBoost',val:.05,pulls:5}},
+  {id:'ss3', icon:'🔮',name:'Pity Reducer',       desc:'Reduce legendary pity counter by 10',           cost:20,  eff:{type:'pityReduce',val:10}},
+  {id:'ss4', icon:'💫',name:'Sticker x2 Token',  desc:'Double sticker earnings for today',             cost:8,   eff:{type:'stickerX2'}},
+  {id:'ss5', icon:'🎁',name:'Mystery Pull',       desc:'A random pull with boosted rare+ chance',       cost:15,  eff:{type:'mysteryPull'}},
+  // Premium boosts
+  {id:'ss6', icon:'⚡',name:'Guaranteed Rare',    desc:'Instantly add a random Rare item to inventory',  cost:50,  eff:{type:'guaranteedPull',tier:'rare'}},
+  {id:'ss7', icon:'🌟',name:'Guaranteed Epic',    desc:'Instantly add a random Epic item to inventory',  cost:80,  eff:{type:'guaranteedPull',tier:'epic'}},
+  {id:'ss8', icon:'🏆',name:'Mega Luck Boost',   desc:'+20% all drop rates for 10 pulls',               cost:100, eff:{type:'tempBoost',val:.20,pulls:10}},
+  {id:'ss9', icon:'🛡️',name:'Streak Shield',     desc:'Your streak survives one missed day',             cost:50,  eff:{type:'streakShield'}},
+  {id:'ss10',icon:'🎯',name:'Pity Slash',         desc:'Reduce legendary pity by 20',                    cost:120, eff:{type:'pityReduce',val:20}},
+  {id:'ss12',icon:'🌺',name:'Uncommon Bundle',   desc:'Add 3 random Uncommon items to inventory',        cost:25,  eff:{type:'guaranteedPull',tier:'uncommon',count:3}},
+  {id:'ss13',icon:'🔱',name:'Epic Pity Boost',   desc:'+50% epic+ drops for next 5 pulls',              cost:100, eff:{type:'tempBoost',val:.50,pulls:5}},
+];
+
+// Accessories — equippable cosmetics for your companion
+const DAILY_SHOP_POOL = [
+  // Titles (shown under companion name)
+  {id:'acc_t1',type:'acc',slot:'title',icon:'👑',name:'Royal Crown',      desc:'"✦ The Crowned ✦" title below your companion\'s name',    label:'✦ The Crowned ✦',       cost:80},
+  {id:'acc_t2',type:'acc',slot:'title',icon:'⚔️',name:'The Adventurer', desc:'"Legendary Adventurer" title below your companion\'s name',label:'Legendary Adventurer',   cost:100},
+  {id:'acc_t3',type:'acc',slot:'title',icon:'🌟',name:'Star of Destiny', desc:'"✨ Star of Destiny ✨" title below your companion\'s name',label:'✨ Star of Destiny ✨',   cost:100},
+  {id:'acc_t4',type:'acc',slot:'title',icon:'🌙',name:'Night Wanderer',  desc:'"~ Night Wanderer ~" title below your companion\'s name',  label:'~ Night Wanderer ~',     cost:80},
+  // Backgrounds (companion card image zone)
+  {id:'acc_b1',type:'acc',slot:'bg',icon:'🌙',name:'Moonlit Night',  desc:'Deep starry blue backdrop',   bg:'linear-gradient(170deg,#1E1E3A 0%,#2A2A5E 60%,#181838 100%)', cost:150},
+  {id:'acc_b2',type:'acc',slot:'bg',icon:'🌸',name:'Cherry Bloom',   desc:'Soft pink blossom backdrop',  bg:'linear-gradient(170deg,#FFE8F0 0%,#FFCCE4 60%,#FFB8DC 100%)', cost:120},
+  {id:'acc_b3',type:'acc',slot:'bg',icon:'🌿',name:'Forest Glade',   desc:'Lush green nature backdrop',  bg:'linear-gradient(170deg,#D0EDD8 0%,#A8D5B5 60%,#80C498 100%)', cost:120},
+  {id:'acc_b4',type:'acc',slot:'bg',icon:'🌅',name:'Golden Sunset',  desc:'Warm amber sunset backdrop',  bg:'linear-gradient(170deg,#FFE4C0 0%,#FFD0A0 60%,#F0A880 100%)', cost:120},
+  {id:'acc_b5',type:'acc',slot:'bg',icon:'🪸',name:'Ocean Deep',     desc:'Cool teal ocean backdrop',    bg:'linear-gradient(170deg,#C0E8F0 0%,#80C8E0 60%,#40A8D0 100%)', cost:140},
+  // Frames (companion card border)
+  {id:'acc_f1',type:'acc',slot:'frame',icon:'✨',name:'Gold Frame',   desc:'Shimmering golden border on the companion card', frameColor:'#C4935A', cost:180},
+  {id:'acc_f2',type:'acc',slot:'frame',icon:'💜',name:'Mystic Frame', desc:'Purple magical border',                          frameColor:'#9A6DD4', cost:160},
+  {id:'acc_f3',type:'acc',slot:'frame',icon:'💙',name:'Frost Frame',  desc:'Icy blue border',                                frameColor:'#5A9ED4', cost:160},
+  {id:'acc_f4',type:'acc',slot:'frame',icon:'🌸',name:'Rose Frame',   desc:'Delicate rose-pink border',                      frameColor:'#D4857A', cost:160},
+  // Auras (glow effect on companion image)
+  {id:'acc_a1',type:'acc',slot:'aura',icon:'💛',name:'Golden Aura',  desc:'Your companion radiates warm golden light',         auraCSS:'drop-shadow(0 0 16px rgba(196,147,90,.9))',  cost:200},
+  {id:'acc_a2',type:'acc',slot:'aura',icon:'💙',name:'Frost Aura',   desc:'A cool icy blue aura surrounds your companion',     auraCSS:'drop-shadow(0 0 16px rgba(90,158,212,.9))',  cost:180},
+  {id:'acc_a3',type:'acc',slot:'aura',icon:'💜',name:'Mystic Aura',  desc:'Swirling purple magic glows around your companion', auraCSS:'drop-shadow(0 0 16px rgba(154,109,212,.9))', cost:180},
+  {id:'acc_a4',type:'acc',slot:'aura',icon:'🌸',name:'Blossom Aura', desc:'A soft pink floral glow',                          auraCSS:'drop-shadow(0 0 16px rgba(212,133,170,.9))', cost:170},
+  // Badges (emoji floating beside companion name)
+  {id:'acc_ba1',type:'acc',slot:'badge',icon:'🌸',name:'Cherry Blossom',desc:'Cherry blossom floats beside your companion\'s name', cost:60},
+  {id:'acc_ba2',type:'acc',slot:'badge',icon:'⭐',name:'Gold Star',      desc:'Golden star beside your companion\'s name',          cost:60},
+  {id:'acc_ba3',type:'acc',slot:'badge',icon:'🔮',name:'Crystal Orb',   desc:'Mystic orb beside your companion\'s name',           cost:80},
+  {id:'acc_ba4',type:'acc',slot:'badge',icon:'🌙',name:'Crescent Moon', desc:'Crescent moon beside your companion\'s name',        cost:70},
+  {id:'acc_ba5',type:'acc',slot:'badge',icon:'🦋',name:'Butterfly',     desc:'A gentle butterfly beside your companion\'s name',   cost:70},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+
+function defaultState(){
+  return {
+    created:false,
+    character:{name:'',avatar:'🧚',personalities:['mystic'],gender:'male'},
+    stickers:0, dailyPoints:0, streak:0, bestStreak:0,
+    totalPulls:0, totalTasksDone:0,
+    pity:{leg:0,myth:0},
+    lastStreakDate:null, lastDailyShop:null,
+    daily:{date:null,pool:[],done:[],claimedPulls:0},
+    inventory:[],
+    ownedShopItems:[],
+    tempBoosts:[],
+    streakShield:0,
+    playerId:null,
+    accessories:[],
+    equippedAcc:{title:null,bg:null,frame:null,aura:null,badge:null},
+    notifEnabled:false,
+    lastNotifDate:null,
+  };
+}
+
+let S = (() => {
+  try {
+    const r = localStorage.getItem('dailyQuest');
+    return r ? JSON.parse(r) : defaultState();
+  } catch(e) { return defaultState(); }
+})();
+
+function save(){
+  if(!S.playerId)S.playerId=Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+  localStorage.setItem('dailyQuest',JSON.stringify(S));
+  syncLeaderboard();
+  saveAccount(S);
+}
+
+// ─── ACCOUNTS ────────────────────────────────────────────────────────────────
+
+function getAllAccounts(){
+  try{return JSON.parse(localStorage.getItem('dqAccounts')||'{}');}catch(e){return {};}
+}
+
+function eraseNonAdminAccounts(){
+  const accts=getAllAccounts();
+  Object.keys(accts).forEach(id=>{
+    if(accts[id].character&&accts[id].character.name!=='BAM_doakkaebi')delete accts[id];
+  });
+  localStorage.setItem('dqAccounts',JSON.stringify(accts));
+  // If current session is non-admin, reset it too
+  if(S.created&&S.character&&S.character.name!=='BAM_doakkaebi'){
+    localStorage.removeItem('dailyQuest');
+    S=defaultState();
+    document.getElementById('app').classList.add('hidden');
+    document.getElementById('create-overlay').classList.remove('hidden');
+    initCreateUI();
+    updatePersCounter();
+  }
+  showToast('All non-admin accounts erased.');
+}
+
+function saveAccount(state){
+  if(!state.playerId||!state.created)return;
+  const accounts=getAllAccounts();
+  accounts[state.playerId]=JSON.parse(JSON.stringify(state));
+  localStorage.setItem('dqAccounts',JSON.stringify(accounts));
+}
+
+function loginAsAccount(playerId){
+  const accounts=getAllAccounts();
+  const saved=accounts[playerId];
+  if(!saved){showToast('Account not found — try again.');return;}
+  // Merge saved account into a fresh defaultState so missing fields never throw
+  const fresh=defaultState();
+  S=Object.assign(fresh, saved);
+  // Ensure required arrays/objects exist
+  if(!S.inventory)S.inventory=[];
+  if(!S.accessories)S.accessories=[];
+  if(!S.equippedAcc)S.equippedAcc={title:null,bg:null,frame:null,aura:null,badge:null};
+  if(!S.tempBoosts)S.tempBoosts=[];
+  if(!S.pity)S.pity={leg:0,myth:0};
+  if(!S.daily)S.daily={date:null,pool:[],done:[],claimedPulls:0,refreshesLeft:3,stockRefreshesLeft:3,shopStock:{},dailyStock:{}};
+  localStorage.setItem('dailyQuest',JSON.stringify(S));
+  applyThemeById(S.character.theme||'sage');
+  document.getElementById('create-overlay').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  try{initDaily();}catch(e){console.warn('initDaily error',e);}
+  try{renderAll();}catch(e){console.warn('renderAll error',e);}
+  try{checkDailyNotification();}catch(e){console.warn('notif error',e);}
+}
+
+function startNewCreate(){
+  createStep=0; selAvatar='knight'; selPers=[]; selGender='male';
+  document.querySelectorAll('.create-step').forEach((s,i)=>s.classList.toggle('hidden',i!==0));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===0));
+  document.getElementById('char-name-input').value='';
+  document.getElementById('name-warning').style.display='none';
+  document.getElementById('login-warning').style.display='none';
+  document.getElementById('acct-select-screen').classList.add('hidden');
+  document.getElementById('create-form-body').classList.remove('hidden');
+  document.getElementById('create-sub').textContent='Create your companion to begin your adventure';
+  rebuildAvatarGrid(); rebuildPersGrid(); buildThemeGrid();
+}
+
+function showAccountSelect(){
+  const accounts=getAllAccounts();
+  const entries=Object.values(accounts).filter(a=>a.created&&a.character&&a.character.name);
+  if(!entries.length)return false;
+  document.getElementById('create-sub').textContent='Welcome back! Choose your companion.';
+  document.getElementById('acct-select-screen').classList.remove('hidden');
+  document.getElementById('create-form-body').classList.add('hidden');
+  const list=document.getElementById('acct-list');
+  list.innerHTML=entries.map(a=>{
+    const src=getAvatarSrc(a.character.avatar,a.character.gender||'male');
+    const avatarHTML=src
+      ?`<img src="${src}" style="width:40px;height:40px;object-fit:contain;" onerror="this.outerHTML='<span style=\\'font-size:2rem\\'>${a.character.avatar}</span>'">`
+      :`<span style="font-size:2rem">${a.character.avatar}</span>`;
+    return `<div class="acct-card" onclick="loginAsAccount('${a.playerId}')">
+      <div class="acct-card-avatar">${avatarHTML}</div>
+      <div class="acct-card-info">
+        <div class="acct-card-name">${a.character.name}${a.character.name==='BAM_doakkaebi'?' 👑':''}</div>
+        <div class="acct-card-sub">🔥 ${a.streak||0} streak · 🏷️ ${a.stickers||0} stickers · ✅ ${a.totalTasksDone||0} tasks</div>
+      </div>
+      <div class="acct-card-arrow">›</div>
+    </div>`;
+  }).join('');
+  return true;
+}
+
+function showLoginSearch(){
+  document.getElementById('acct-select-screen').classList.add('hidden');
+  document.getElementById('create-form-body').classList.add('hidden');
+  document.getElementById('login-search-screen').classList.remove('hidden');
+  document.getElementById('create-sub').textContent='Find your account by name.';
+  document.getElementById('login-search-input').value='';
+  document.getElementById('login-search-results').innerHTML='';
+  document.getElementById('login-search-empty').style.display='none';
+  setTimeout(()=>document.getElementById('login-search-input').focus(),50);
+}
+
+function backToAccountSelect(){
+  document.getElementById('login-search-screen').classList.add('hidden');
+  const had=showAccountSelect();
+  if(!had){
+    document.getElementById('create-sub').textContent='Create your companion to begin your adventure';
+    document.getElementById('create-form-body').classList.remove('hidden');
+  }
+}
+
+function searchAccountByName(){
+  const name=document.getElementById('login-search-input').value.trim();
+  const results=document.getElementById('login-search-results');
+  const empty=document.getElementById('login-search-empty');
+  results.innerHTML='';
+  empty.style.display='none';
+  if(!name)return;
+  const accounts=getAllAccounts();
+  const matches=Object.values(accounts).filter(a=>
+    a.character&&a.character.name.toLowerCase().includes(name.toLowerCase())
+  );
+  if(!matches.length){empty.style.display='block';return;}
+  results.innerHTML=matches.map(a=>{
+    const src=getAvatarSrc(a.character.avatar,a.character.gender||'male');
+    const avatarHTML=src
+      ?`<img src="${src}" style="width:40px;height:40px;object-fit:contain;" onerror="this.outerHTML='<span style=\\'font-size:2rem\\'>${a.character.avatar}</span>'">`
+      :`<span style="font-size:2rem">${a.character.avatar}</span>`;
+    return `<div class="acct-card" onclick="loginAsAccount('${a.playerId}')">
+      <div class="acct-card-avatar">${avatarHTML}</div>
+      <div class="acct-card-info">
+        <div class="acct-card-name">${a.character.name}${a.character.name==='BAM_doakkaebi'?' 👑':''}</div>
+        <div class="acct-card-sub">🔥 ${a.streak||0} streak · 🏷️ ${a.stickers||0} stickers · ✅ ${a.totalTasksDone||0} tasks</div>
+      </div>
+      <div class="acct-card-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── LOGIN PAGE ───────────────────────────────────────────────────────────────
+
+function openLoginPage(){
+  document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('lp-name-input').value='';
+  document.getElementById('lp-results').innerHTML='';
+  document.getElementById('lp-not-found').style.display='none';
+  document.getElementById('lp-back-btn').style.display='block';
+  setTimeout(function(){document.getElementById('lp-name-input').focus();},50);
+}
+
+function lpGoBack(){
+  document.getElementById('login-page').classList.add('hidden');
+  // Return to the very first create/account screen
+  document.getElementById('create-overlay').classList.remove('hidden');
+  try{initCreateUI();}catch(e){console.error(e);}
+}
+
+function lpSearch(){
+  var name=document.getElementById('lp-name-input').value.trim();
+  var results=document.getElementById('lp-results');
+  var notFound=document.getElementById('lp-not-found');
+  var backBtn=document.getElementById('lp-back-btn');
+  results.innerHTML='';
+  notFound.style.display='none';
+  backBtn.style.display='block';
+  if(!name)return;
+  var accounts=getAllAccounts();
+  var matches=Object.values(accounts).filter(function(a){
+    return a.character&&a.character.name.toLowerCase().indexOf(name.toLowerCase())!==-1;
+  });
+  if(!matches.length){
+    notFound.style.display='block';
+    backBtn.style.display='none';
+    return;
+  }
+  results.innerHTML=matches.map(function(a){
+    var src=getAvatarSrc(a.character.avatar,a.character.gender||'male');
+    var av=src
+      ?('<img src="'+src+'" style="width:40px;height:40px;object-fit:contain;">')
+      :('<span style="font-size:2rem">'+a.character.avatar+'</span>');
+    var isAdmin=a.character.name==='BAM_doakkaebi';
+    return '<div class="acct-card" onclick="lpLogin(\''+a.playerId+'\')">'
+      +'<div class="acct-card-avatar">'+av+'</div>'
+      +'<div class="acct-card-info">'
+      +'<div class="acct-card-name">'+a.character.name+(isAdmin?' 👑':'')+'</div>'
+      +'<div class="acct-card-sub">🔥 '+(a.streak||0)+' streak · 🏷️ '+(a.stickers||0)+' stickers · ✅ '+(a.totalTasksDone||0)+' tasks</div>'
+      +'</div>'
+      +'<div class="acct-card-arrow">›</div>'
+      +'</div>';
+  }).join('');
+}
+
+function lpLogin(playerId){
+  document.getElementById('login-page').classList.add('hidden');
+  document.getElementById('create-overlay').classList.add('hidden');
+  loginAsAccount(playerId);
+}
+
+// ─── CREATION FLOW ────────────────────────────────────────────────────────────
+
+let createStep = 0, selAvatar = 'knight', selPers = [], selGender = 'male';
+
+function initCreateUI(){
+  // Ensure no other overlay is blocking the create screen
+  ['lb-panel','pull-overlay','verify-overlay'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.add('hidden');
+  });
+  const hadAccts=showAccountSelect();
+  if(!hadAccts){
+    // No saved accounts — show the creation form directly
+    document.getElementById('create-form-body').classList.remove('hidden');
+    document.getElementById('login-search-screen').classList.add('hidden');
+    // Ensure step 0 is visible and others hidden
+    for(let i=0;i<=4;i++) document.getElementById('cstep-'+i).classList.toggle('hidden',i!==0);
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===0));
+  }
+  rebuildAvatarGrid();
+  rebuildPersGrid();
+  buildThemeGrid();
+}
+
+function rebuildAvatarGrid(){
+  const ag = document.getElementById('avatar-grid');
+  ag.innerHTML = AVATARS.map(a => {
+    const src = getAvatarSrc(a, selGender);
+    const inner = src
+      ? `<img src="${src}" alt="${a}" style="width:36px;height:36px;object-fit:contain;display:block;margin:0 auto;"
+           onerror="this.outerHTML='<span style=\\'font-size:1.8rem\\'>⚔️</span>'">`
+      : a;
+    return `<div class="av-btn ${a===selAvatar?'sel':''}" onclick="pickAvatar('${a}')">${inner}</div>`;
+  }).join('');
+}
+
+function pickGender(g){
+  selGender = g;
+  document.querySelectorAll('.gender-btn').forEach(b =>
+    b.classList.toggle('sel', b.dataset.gender === g)
+  );
+  // Refresh avatar grid so knight shows the right gendered image
+  rebuildAvatarGrid();
+}
+
+function pickAvatar(a){
+  selAvatar = a;
+  document.querySelectorAll('.av-btn').forEach(b => {
+    const match = b.querySelector('img') ? b.querySelector('img').alt === a : b.textContent.trim() === a;
+    b.classList.toggle('sel', match);
+  });
+}
+
+function rebuildPersGrid(){
+  const pg = document.getElementById('pers-grid');
+  if (!pg) return;
+  pg.innerHTML = PERSONALITIES.map(p =>
+    `<div class="pers-btn ${selPers.includes(p.id)?'sel':''}" data-id="${p.id}" onclick="pickPers('${p.id}')">
+      <span class="p-icon">${p.icon}</span>
+      <span class="p-name">${p.name}</span>
+      <span class="p-desc">${p.desc}</span>
+    </div>`
+  ).join('');
+  updatePersCounter();
+}
+
+function updatePersCounter(){
+  const lbl = document.getElementById('pers-count-label');
+  if (lbl) lbl.textContent = `${selPers.length} / 3 selected`;
+  const btn = document.getElementById('finish-btn');
+  if (btn) btn.disabled = selPers.length === 0;
+}
+
+function pickPers(id){
+  if (selPers.includes(id)) {
+    selPers = selPers.filter(p => p !== id);
+  } else {
+    if (selPers.length >= 3) { showToast('Max 3 personalities!'); return; }
+    selPers.push(id);
+  }
+  document.querySelectorAll('.pers-btn').forEach(b =>
+    b.classList.toggle('sel', selPers.includes(b.dataset.id))
+  );
+  updatePersCounter();
+}
+
+function checkNameAvailable(){
+  const name=document.getElementById('char-name-input').value.trim();
+  const warn=document.getElementById('name-warning');
+  document.getElementById('login-warning').style.display='none';
+  if(!name){warn.style.display='none';return;}
+  const accounts=getAllAccounts();
+  const taken=Object.values(accounts).some(a=>a.character&&a.character.name.toLowerCase()===name.toLowerCase()&&a.playerId!==S.playerId);
+  warn.style.display=taken?'block':'none';
+}
+
+function loginByName(){
+  const name=document.getElementById('char-name-input').value.trim();
+  document.getElementById('name-warning').style.display='none';
+  document.getElementById('login-warning').style.display='none';
+  if(!name){showToast('Type your account name first!');return;}
+  const accounts=getAllAccounts();
+  const match=Object.values(accounts).find(a=>a.character&&a.character.name.toLowerCase()===name.toLowerCase());
+  if(!match){
+    document.getElementById('login-warning').style.display='block';
+    return;
+  }
+  loginAsAccount(match.playerId);
+}
+
+function nextStep(n){
+  if(n===1){
+    const name = document.getElementById('char-name-input').value.trim();
+    if(!name){ showToast('Give your companion a name!'); return; }
+    const accounts=getAllAccounts();
+    const taken=Object.values(accounts).some(a=>a.character&&a.character.name.toLowerCase()===name.toLowerCase()&&a.playerId!==S.playerId);
+    if(taken){
+      document.getElementById('name-warning').style.display='block';
+      document.getElementById('char-name-input').focus();
+      return;
+    }
+    document.getElementById('name-warning').style.display='none';
+  }
+  if(n===2){
+    // Rebuild avatar grid with selected gender before showing it
+    rebuildAvatarGrid();
+  }
+  document.getElementById('cstep-'+createStep).classList.add('hidden');
+  createStep = n;
+  document.getElementById('cstep-'+n).classList.remove('hidden');
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i<=n));
+}
+
+function finishCreate(){
+  const name = document.getElementById('char-name-input').value.trim() || 'Luna';
+  const accounts=getAllAccounts();
+  const taken=Object.values(accounts).some(a=>a.character&&a.character.name.toLowerCase()===name.toLowerCase()&&a.playerId!==S.playerId);
+  if(taken){ showToast('That name is already taken! Choose a different name.'); return; }
+  S.character = { name, avatar: selAvatar, personalities: [...selPers], gender: selGender, theme: selTheme };
+  S.created = true;
+  applyThemeById(selTheme);
+  save();
+  document.getElementById('create-overlay').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  initDaily();
+  renderAll();
+}
+
+function switchAccount(){
+  // Save current progress then return to the account picker
+  save();
+  // Force-close any overlays that could cover the create screen
+  ['lb-panel','pull-overlay','verify-overlay'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.add('hidden');
+  });
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('create-overlay').classList.remove('hidden');
+  // Reset creation form state so it's clean if they start a new one
+  createStep = 0; selAvatar = 'knight'; selPers = []; selGender = 'male';
+  document.querySelectorAll('.create-step').forEach((s,i) => s.classList.toggle('hidden', i!==0));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===0));
+  document.getElementById('char-name-input').value = '';
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('sel'));
+  // Always show account picker (accounts definitely exist since we're logged in)
+  document.getElementById('login-search-screen').classList.add('hidden');
+  document.getElementById('acct-select-screen').classList.remove('hidden');
+  document.getElementById('create-form-body').classList.add('hidden');
+  document.getElementById('create-sub').textContent = 'Welcome back! Choose your companion.';
+  showAccountSelect();
+}
+
+function resetCharacter(){
+  if(!confirm('Reset your companion and all progress? This cannot be undone.')) return;
+  // Remove from accounts store too
+  if(S.playerId){
+    const accts=getAllAccounts();
+    delete accts[S.playerId];
+    localStorage.setItem('dqAccounts',JSON.stringify(accts));
+  }
+  localStorage.removeItem('dailyQuest');
+  S = defaultState();
+  createStep = 0; selAvatar = 'knight'; selPers = []; selGender = 'male';
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('create-overlay').classList.remove('hidden');
+  document.querySelectorAll('.create-step').forEach((s,i) => s.classList.toggle('hidden', i!==0));
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===0));
+  document.getElementById('char-name-input').value = '';
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('sel'));
+  initCreateUI();
+  updatePersCounter();
+}
+
+// ─── DAILY TASKS ─────────────────────────────────────────────────────────────
+
+function todayStr(){return new Date().toISOString().slice(0,10);}
+
+function initDaily(){
+  const today=todayStr();
+  if(S.daily.date!==today){
+    const seed=today.replace(/-/g,'')|0;
+    const shuffled=[...ALL_TASKS];
+    for(let i=shuffled.length-1;i>0;i--){
+      const j=Math.abs((seed*(i+13))%(i+1));
+      [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];
+    }
+    function _itemRand(id){
+      // Hash item ID + today string → stable unique float 0..1 per item per day
+      const str=id+today;
+      let h=2166136261>>>0;
+      for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),16777619)>>>0;}
+      return (h>>>0)/4294967296;
+    }
+    function _stockVal(id,cost){
+      const f=_itemRand(id);
+      if(cost>=25) return f<0.5?0:1+Math.floor((f-0.5)*6); // 0-3, 50% chance 0
+      return 5+Math.floor(f*6); // 5-10
+    }
+    const shopStock={};
+    STICKER_SHOP.forEach(item=>{
+      shopStock[item.id]={max:_stockVal(item.id,item.cost),sold:0};
+    });
+    const dailyStock={};
+    DAILY_SHOP_POOL.forEach(item=>{
+      dailyStock[item.id]={max:_stockVal(item.id,item.cost),sold:0};
+    });
+    S.daily={date:today,pool:shuffled.slice(0,10).map(t=>t.id),done:[],claimedPulls:0,refreshesLeft:3,shopStock,dailyStock,stockRefreshesLeft:3};
+    save();
+  }
+}
+
+function getPullsEarned(){
+  return S.daily.done.length * 5;
+}
+
+function isAdmin(){return S.character&&S.character.name==='BAM_doakkaebi';}
+
+function getMergedVal(baseVal, mergeLevel){
+  return Math.round(baseVal * (1 + mergeLevel) * 1000) / 1000;
+}
+
+function checkMerges(){
+  const groups={};
+  S.inventory.forEach(i=>{
+    const key=`${i.id}:${i.mergeLevel||0}`;
+    if(!groups[key])groups[key]=[];
+    groups[key].push(i);
+  });
+  let anyMerged=false;
+  for(const [key,items] of Object.entries(groups)){
+    if(items.length>=5){
+      const [id,mlStr]=key.split(':');
+      const ml=parseInt(mlStr);
+      // Unequip any equipped copies before removal
+      items.slice(0,5).forEach(c=>{
+        const inv=S.inventory.find(i=>i.instanceId===c.instanceId);
+        if(inv)inv.equipped=false;
+      });
+      items.slice(0,5).forEach(c=>{
+        const idx=S.inventory.findIndex(i=>i.instanceId===c.instanceId);
+        if(idx!==-1)S.inventory.splice(idx,1);
+      });
+      S.inventory.push({id,instanceId:Date.now()+Math.random(),equipped:false,mergeLevel:ml+1});
+      anyMerged=true;
+    }
+  }
+  if(anyMerged)checkMerges();
+  return anyMerged;
+}
+
+function getPullsAvailable(){
+  if(isAdmin())return 999;
+  return Math.max(0,getPullsEarned()-S.daily.claimedPulls);
+}
+
+function refreshTask(id, event){
+  event.stopPropagation();
+  const left=S.daily.refreshesLeft??3;
+  if(left<=0){showToast('No refreshes left for today!');return;}
+  if(S.daily.done.includes(id)){showToast("Can't refresh a completed task!");return;}
+  const used=new Set(S.daily.pool);
+  const candidates=ALL_TASKS.filter(t=>!used.has(t.id)&&!S.daily.done.includes(t.id));
+  if(!candidates.length){showToast('No other tasks to swap in!');return;}
+  const pick=candidates[Math.floor(Math.random()*candidates.length)];
+  const idx=S.daily.pool.indexOf(id);
+  S.daily.pool[idx]=pick.id;
+  S.daily.refreshesLeft=left-1;
+  save();renderAll();
+  showToast(`🔄 Swapped for ${pick.icon} ${pick.name}! (${S.daily.refreshesLeft} refresh${S.daily.refreshesLeft===1?'':'es'} left)`);
+}
+
+function completeTask(id){
+  if(S.daily.done.includes(id)){showToast('Already done!');return;}
+  S.daily.done.push(id);
+  // Streak update
+  const today=todayStr();
+  if(S.daily.done.length===3){
+    const yest=new Date();yest.setDate(yest.getDate()-1);
+    const yStr=yest.toISOString().slice(0,10);
+    if(S.lastStreakDate===yStr||S.lastStreakDate===today){
+      if(S.lastStreakDate!==today)S.streak++;
+    } else {
+      S.streak=1;
+    }
+    if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+    S.lastStreakDate=today;
+    // Daily points from streak
+    const pts=10+Math.min(S.streak*2,40);
+    S.dailyPoints+=pts;
+    showToast(`🔥 Streak! +${pts} daily points`);
+  }
+  // Stickers per task
+  const baseStickers=S.daily.done.length<=3?2:4;
+  S.stickers+=baseStickers;
+  S.totalTasksDone++;
+  save();
+  renderAll();
+  if(getPullsAvailable()>0){
+    setTimeout(()=>showToast(`✨ +5 pull tickets! Visit Companion tab`),600);
+  }
+}
+
+// ─── DROP SYSTEM ──────────────────────────────────────────────────────────────
+
+function calcRates(){
+  let r={...BASE_RATES};
+  const equipped=S.inventory.filter(i=>i.equipped);
+  // Temp boosts
+  const active=S.tempBoosts.filter(b=>b.pullsLeft>0);
+  for(const b of active){
+    if(b.type==='dropBoost')  {r.uncommon+=b.val*.3;r.rare+=b.val*.3;r.epic+=b.val*.2;r.legendary+=b.val*.1;r.mythic+=b.val*.1;r.common-=b.val;}
+    if(b.type==='rareBoost')  {const add=b.val;r.rare+=add*.5;r.epic+=add*.3;r.legendary+=add*.15;r.mythic+=add*.05;r.common-=add*.7;r.uncommon-=add*.3;}
+    if(b.type==='epicBoost')  {r.epic+=b.val*.5;r.legendary+=b.val*.3;r.mythic+=b.val*.2;r.common-=b.val*.6;r.uncommon-=b.val*.3;r.rare-=b.val*.1;}
+    if(b.type==='legendBoost'){r.legendary+=b.val*.6;r.mythic+=b.val*.4;r.common-=b.val*.5;r.uncommon-=b.val*.3;r.rare-=b.val*.2;}
+  }
+  for(const inv of equipped){
+    const item=ITEMS.find(i=>i.id===inv.id);
+    if(!item||!item.eff)continue;
+    const {type}=item.eff;
+    const val=getMergedVal(item.eff.val, inv.mergeLevel||0);
+    if(type==='dropBoost')  {r.uncommon+=val*.3;r.rare+=val*.3;r.epic+=val*.2;r.legendary+=val*.1;r.mythic+=val*.1;r.common-=val;}
+    if(type==='rareBoost')  {r.rare+=val*.5;r.epic+=val*.3;r.legendary+=val*.15;r.mythic+=val*.05;r.common-=val*.7;r.uncommon-=val*.3;}
+    if(type==='epicBoost')  {r.epic+=val*.5;r.legendary+=val*.3;r.mythic+=val*.2;r.common-=val*.6;r.uncommon-=val*.3;r.rare-=val*.1;}
+    if(type==='legendBoost'){r.legendary+=val*.6;r.mythic+=val*.4;r.common-=val*.5;r.uncommon-=val*.3;r.rare-=val*.2;}
+  }
+  // Pity override
+  if(S.pity.leg>=PITY_LEG){r={common:0,uncommon:0,rare:0,epic:0,legendary:1,mythic:0};}
+  else if(S.pity.myth>=PITY_MYTH){r={common:0,uncommon:0,rare:0,epic:0,legendary:0,mythic:1};}
+  // Clamp & normalize
+  Object.keys(r).forEach(k=>r[k]=Math.max(0,r[k]));
+  const total=Object.values(r).reduce((a,b)=>a+b,0);
+  if(total>0)Object.keys(r).forEach(k=>r[k]=r[k]/total);
+  return r;
+}
+
+function rollTier(rates){
+  const rng=Math.random();
+  let acc=0;
+  for(const [tier,rate] of Object.entries(rates)){
+    acc+=rate;
+    if(rng<=acc)return tier;
+  }
+  return 'common';
+}
+
+function pickItemOfTier(tier){
+  const pool=ITEMS.filter(i=>i.tier===tier);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// Pull queue for sequential reveals
+let pullQueue=[];
+let currentPullItem=null;
+
+function claimPulls(){
+  const avail=getPullsAvailable();
+  if(avail<=0){showToast('No pulls available!');return;}
+  const rates=calcRates();
+  pullQueue=[];
+  for(let i=0;i<avail;i++){
+    const tier=rollTier(rates);
+    const item=pickItemOfTier(tier);
+    pullQueue.push(item);
+    S.pity.leg++;S.pity.myth++;
+    if(tier==='legendary'||tier==='mythic')S.pity.leg=0;
+    if(tier==='mythic')S.pity.myth=0;
+    S.totalPulls++;
+    // Tick temp boosts
+    S.tempBoosts.forEach(b=>{if(b.pullsLeft>0)b.pullsLeft--;});
+    S.tempBoosts=S.tempBoosts.filter(b=>b.pullsLeft>0);
+  }
+  if(!isAdmin())S.daily.claimedPulls+=avail;
+  save();
+  showNextPull();
+}
+
+function showNextPull(){
+  if(pullQueue.length===0){
+    document.getElementById('pull-overlay').classList.add('hidden');
+    renderAll();
+    return;
+  }
+  currentPullItem=pullQueue.shift();
+  const overlay=document.getElementById('pull-overlay');
+  const bg=document.getElementById('pull-bg');
+  const content=document.getElementById('pull-content');
+  overlay.classList.remove('hidden');
+  const tier=TIERS[currentPullItem.tier];
+  bg.style.background=`linear-gradient(135deg, ${tier.bg}, white)`;
+  content.innerHTML=`<div class="pull-question" style="font-size:4rem">❓</div>
+    <div style="font-size:0.8rem;color:${tier.color};margin-top:8px;font-family:'Indie Flower',cursive">tap to reveal</div>`;
+  // After brief delay auto-show
+  overlay.onclick=revealPull;
+}
+
+function revealPull(){
+  if(!currentPullItem)return;
+  const item=currentPullItem;
+  const tier=TIERS[item.tier];
+  const remaining=pullQueue.length;
+  document.getElementById('pull-content').innerHTML=`
+    <div class="pull-item-emoji">${item.icon}</div>
+    <div class="pull-tier-name bg-${item.tier}" style="color:${tier.color}">${tier.name}</div>
+    <div class="pull-item-name" style="color:${tier.textColor}">${item.name}</div>
+    <div class="pull-item-desc" style="color:${tier.textColor}">${item.desc}</div>
+    <div class="pull-tap">${remaining>0?`${remaining} more pull${remaining>1?'s':''} remaining — tap to continue`:'Tap to close'}</div>`;
+  // Add to inventory
+  const isOneUse=item.eff&&['stickers','pityReduce','pityHalve','pityReset'].includes(item.eff.type);
+  if(!isOneUse){
+    S.inventory.push({id:item.id,instanceId:Date.now()+Math.random(),equipped:false,mergeLevel:0});
+    if(checkMerges()){
+      const merged=S.inventory.find(i=>i.id===item.id&&(i.mergeLevel||0)>0);
+      const ml=merged?merged.mergeLevel:1;
+      const stars='★'.repeat(ml);
+      setTimeout(()=>showToast(`✨ ${stars} Merge! 5× ${item.name} → stronger version (${ml+1}× effect)!`),400);
+    }
+  } else {
+    applyItemEffect(item);
+  }
+  save();
+  currentPullItem=null;
+  document.getElementById('pull-overlay').onclick=nextPull;
+}
+
+function nextPull(){if(currentPullItem){revealPull();}else{showNextPull();}}
+
+function applyItemEffect(item){
+  if(!item.eff)return;
+  const {type,val}=item.eff;
+  if(type==='stickers'){S.stickers+=val;showToast(`+${val} stickers! 🏷️`);}
+  if(type==='pityReduce'){S.pity.leg=Math.max(0,S.pity.leg-val);S.pity.myth=Math.max(0,S.pity.myth-val);showToast(`Pity reduced by ${val}! 🔮`);}
+  if(type==='pityHalve'){S.pity.leg=Math.floor(S.pity.leg*val);S.pity.myth=Math.floor(S.pity.myth*val);showToast('Pity halved! ✨');}
+  if(type==='pityReset'){S.pity.leg=0;S.pity.myth=0;showToast('Pity fully reset! 💎');}
+  save();
+}
+
+function useInventoryItem(instanceId){
+  const idx=S.inventory.findIndex(i=>i.instanceId===instanceId);
+  if(idx===-1)return;
+  const inv=S.inventory[idx];
+  const item=ITEMS.find(i=>i.id===inv.id);
+  if(!item||!item.eff)return;
+  const {type}=item.eff;
+  const isOneUse=['stickers','pityReduce','pityHalve','pityReset'].includes(type);
+  if(isOneUse){applyItemEffect(item);S.inventory.splice(idx,1);save();renderAll();}
+}
+
+function toggleEquip(instanceId){
+  const inv=S.inventory.find(i=>i.instanceId===instanceId);
+  if(!inv)return;
+  const item=ITEMS.find(i=>i.id===inv.id);
+  if(!item||!item.eff)return;
+  const isOneUse=['stickers','pityReduce','pityHalve','pityReset'].includes(item.eff.type);
+  if(isOneUse){useInventoryItem(instanceId);return;}
+  const equipped=S.inventory.filter(i=>i.equipped);
+  if(!inv.equipped&&equipped.length>=3){showToast('Max 3 items equipped!');return;}
+  inv.equipped=!inv.equipped;
+  save();renderAll();
+}
+
+// ─── SHOPS ────────────────────────────────────────────────────────────────────
+
+function getDailyShopItems(){
+  return DAILY_SHOP_POOL; // show all accessories always
+}
+
+function buyStickerShop(id){
+  const item=STICKER_SHOP.find(i=>i.id===id);
+  if(!item)return;
+  if(!isAdmin()){
+    const stock=(S.daily.shopStock||{})[id];
+    const remaining=stock?stock.max-stock.sold:0;
+    if(remaining<=0){showToast('Out of stock today!');return;}
+    if(S.stickers<item.cost){showToast('Not enough stickers!');return;}
+    S.stickers-=item.cost;
+    if(!S.daily.shopStock)S.daily.shopStock={};
+    if(!S.daily.shopStock[id])S.daily.shopStock[id]={max:remaining,sold:0};
+    S.daily.shopStock[id].sold++;
+  }
+  applyStickerShopEffect(item);
+  save();renderAll();
+}
+
+function applyStickerShopEffect(item){
+  const {eff}=item;
+  if(eff.type==='pull'){S.daily.claimedPulls=Math.max(0,S.daily.claimedPulls-eff.val);showToast('+1 free pull added! 🎲');}
+  if(eff.type==='tempBoost'){S.tempBoosts.push({type:'dropBoost',val:eff.val,pullsLeft:eff.pulls});showToast(`+${eff.val*100}% boost for ${eff.pulls} pulls!`);}
+  if(eff.type==='pityReduce'){S.pity.leg=Math.max(0,S.pity.leg-eff.val);S.pity.myth=Math.max(0,S.pity.myth-eff.val);showToast(`Pity -${eff.val}! 🔮`);}
+  if(eff.type==='stickerX2'){S.stickerX2=true;showToast('Sticker x2 active today!');}
+  if(eff.type==='mysteryPull'){
+    S.tempBoosts.push({type:'rareBoost',val:.20,pullsLeft:1});
+    S.daily.claimedPulls=Math.max(0,S.daily.claimedPulls-1);
+    showToast('Mystery pull + boost ready! 🎁');
+  }
+}
+
+function buyDailyShop(id){
+  const item=DAILY_SHOP_POOL.find(i=>i.id===id);
+  if(!item)return;
+  if((S.accessories||[]).includes(id)){showToast('Already owned!');return;}
+  if(!isAdmin()){
+    const ds=(S.daily.dailyStock||{})[id];
+    const remaining=ds?ds.max-ds.sold:0;
+    if(remaining<=0){showToast('Out of stock today!');return;}
+    if(S.dailyPoints<item.cost){showToast('Not enough daily points!');return;}
+    S.dailyPoints-=item.cost;
+    if(!S.daily.dailyStock)S.daily.dailyStock={};
+    if(!S.daily.dailyStock[id])S.daily.dailyStock[id]={max:remaining,sold:0};
+    S.daily.dailyStock[id].sold++;
+  }
+  if(!S.accessories)S.accessories=[];
+  S.accessories.push(id);
+  showToast(`✨ ${item.name} unlocked! Find it in My Items.`);
+  save();renderAll();
+}
+
+function toggleEquipAcc(id){
+  const item=DAILY_SHOP_POOL.find(i=>i.id===id);
+  if(!item)return;
+  if(!S.equippedAcc)S.equippedAcc={};
+  if(S.equippedAcc[item.slot]===id){
+    S.equippedAcc[item.slot]=null;
+    showToast(`${item.name} removed`);
+  } else {
+    S.equippedAcc[item.slot]=id;
+    showToast(`✨ ${item.name} equipped!`);
+  }
+  save();renderAll();
+}
+
+function applyDailyShopEffect(item){
+  // kept for legacy item support
+  const {eff}=item;
+  if(!eff)return;
+  if(eff.type==='guaranteedPull'){
+    const count=eff.count||1;
+    for(let i=0;i<count;i++){
+      const pulled=pickItemOfTier(eff.tier);
+      const isOneUse=pulled.eff&&['stickers','pityReduce','pityHalve','pityReset'].includes(pulled.eff.type);
+      if(isOneUse)applyItemEffect(pulled);
+      else S.inventory.push({id:pulled.id,instanceId:Date.now()+Math.random()+i,equipped:false,mergeLevel:0});
+    }
+    if(checkMerges())showToast(`✨ Merge triggered! Items combined into stronger version.`);
+    showToast(`Added ${count} ${eff.tier} item${count>1?'s':''}! 🎉`);
+  }
+  if(eff.type==='tempBoost'){S.tempBoosts.push({type:'dropBoost',val:eff.val,pullsLeft:eff.pulls});showToast(`+${eff.val*100}% boost!`);}
+  if(eff.type==='streakShield'){S.streakShield=(S.streakShield||0)+1;showToast('Streak Shield! 🛡️');}
+  if(eff.type==='pityReduce'){S.pity.leg=Math.max(0,S.pity.leg-eff.val);S.pity.myth=Math.max(0,S.pity.myth-eff.val);showToast(`Pity -${eff.val}!`);}
+  if(eff.type==='stickers'){S.stickers+=eff.val;showToast(`+${eff.val} stickers!`);}
+}
+
+let currentShopTab='sticker';
+function shopTab(tab){
+  currentShopTab=tab;
+  document.getElementById('stab-sticker').classList.toggle('active',tab==='sticker');
+  document.getElementById('stab-daily').classList.toggle('active',tab==='daily');
+  document.getElementById('sticker-shop-content').classList.toggle('hidden',tab!=='sticker');
+  document.getElementById('daily-shop-content').classList.toggle('hidden',tab!=='daily');
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+
+function renderAll(){
+  renderTopBar();
+  renderHome();
+  renderTasks();
+  renderCharacterPage();
+  renderShop();
+  renderInventory();
+  renderSettings();
+  setTimeout(_applyAcc, 80);
+}
+
+function renderSettings(){
+  const {name, avatar, gender} = S.character;
+  const personalities = S.character.personalities || [S.character.personality || 'mystic'];
+  const persObjs = personalities.map(id => PERSONALITIES.find(p => p.id === id)).filter(Boolean);
+  const genderLabel = gender === 'female' ? 'Female' : gender === 'neutral' ? 'Non-binary' : 'Male';
+  const genderIcon  = gender === 'female' ? '🌸' : gender === 'neutral' ? '✨' : '🗡️';
+  const wrap = document.getElementById('settings-avatar-wrap');
+  if (wrap) {
+    const src = getAvatarSrc(avatar, gender || 'male');
+    wrap.innerHTML = src
+      ? `<img src="${src}" style="width:56px;height:56px;object-fit:contain;" onerror="this.outerHTML='<span style=\\'font-size:2.5rem\\'>⚔️</span>'">`
+      : `<span style="font-size:2.5rem">${avatar}</span>`;
+  }
+  const nameEl = document.getElementById('settings-char-name');
+  if (nameEl) nameEl.textContent = name || '—';
+  const detEl = document.getElementById('settings-char-details');
+  if (detEl) detEl.textContent = `${persObjs.map(p=>p.icon+' '+p.name).join(' · ')}  ·  ${genderIcon} ${genderLabel}`;
+  const sStreak = document.getElementById('s-streak');
+  if (sStreak) {
+    sStreak.textContent  = S.bestStreak || 0;
+    document.getElementById('s-pulls').textContent = S.totalPulls || 0;
+    document.getElementById('s-tasks').textContent = S.totalTasksDone || 0;
+    document.getElementById('s-items').textContent = (S.inventory || []).length;
+  }
+  const eraseWrap=document.getElementById('admin-erase-wrap');
+  if(eraseWrap)eraseWrap.style.display=isAdmin()?'block':'none';
+  renderNotifCard();
+  renderMusicCard();
+}
+
+function renderNotifCard(){
+  const supported='Notification' in window;
+  const perm=supported?Notification.permission:'denied';
+  const enabled=S.notifEnabled&&perm==='granted';
+  const btn=document.getElementById('notif-toggle-btn');
+  const status=document.getElementById('notif-status');
+  const testBtn=document.getElementById('notif-test-btn');
+  if(!btn)return;
+  if(!supported){
+    btn.textContent='Not supported';btn.disabled=true;
+    if(status)status.textContent='Your browser does not support notifications.';
+    return;
+  }
+  btn.disabled=false;
+  if(enabled){
+    btn.textContent='Disable';btn.className='btn btn-outline btn-sm';
+    if(status)status.textContent='✓ Notifications are on — you\'ll be reminded when you open the app each day.';
+    if(testBtn)testBtn.classList.remove('hidden');
+  } else {
+    btn.textContent=perm==='denied'?'Blocked':'Enable';
+    btn.className='btn btn-teal btn-sm';
+    btn.disabled=perm==='denied';
+    if(status)status.textContent=perm==='denied'
+      ?'Notifications are blocked. Allow them in your browser settings, then try again.'
+      :'Tap Enable to get daily task reminders.';
+    if(testBtn)testBtn.classList.add('hidden');
+  }
+}
+
+async function toggleNotifications(){
+  if(S.notifEnabled){
+    S.notifEnabled=false;save();renderNotifCard();
+    showToast('Notifications disabled');return;
+  }
+  if(!('Notification' in window)){showToast('Not supported in this browser');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    S.notifEnabled=true;save();renderNotifCard();
+    showToast('Daily reminders enabled! 🔔');
+  } else {
+    showToast('Permission denied — check your browser settings');
+    renderNotifCard();
+  }
+}
+
+function fireNotification(isTest=false){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const done=S.daily.done.length;
+  const streak=S.streak||0;
+  const hour=new Date().getHours();
+  const greeting=hour<12?'Good morning':'hour'<17?'Good afternoon':'Good evening';
+  let body;
+  if(isTest){
+    body=`This is a test! You've done ${done}/10 tasks today. ${streak>0?`🔥 ${streak}-day streak!`:'Start your streak today!'}`;
+  } else if(done===0){
+    body=`${greeting}! ✨ Your daily quests are waiting. ${streak>0?`Keep your 🔥 ${streak}-day streak alive!`:'Start a streak today!'}`;
+  } else if(done<3){
+    body=`You've done ${done}/10 tasks — ${3-done} more to secure your 🔥 streak! You've got this!`;
+  } else if(done<10){
+    body=`Streak secured! 🔥 You've completed ${done}/10 tasks. Push for more?`;
+  } else {
+    body=`PERFECT DAY! 🌟 All 10 tasks done! You're unstoppable!`;
+  }
+  new Notification('Daily Quest ✨',{body,icon:'',tag:'daily-quest-reminder'});
+}
+
+function checkDailyNotification(){
+  if(!S.notifEnabled||!('Notification' in window)||Notification.permission!=='granted')return;
+  const today=new Date().toISOString().slice(0,10);
+  if(S.lastNotifDate===today)return;
+  const hour=new Date().getHours();
+  if(hour<7||hour>22)return;
+  S.lastNotifDate=today;save();
+  fireNotification(false);
+}
+
+function renderTopBar(){
+  document.getElementById('tb-streak').textContent=`${S.streak} day streak`;
+  document.getElementById('tb-stickers').textContent=S.stickers;
+  document.getElementById('tb-points').textContent=S.dailyPoints;
+}
+
+let dialogueTapOffset = 0;
+
+function getDialogue(taskCount){
+  const personalities = S.character.personalities || [S.character.personality || 'mystic'];
+  const pick = personalities[Math.floor(Date.now()/60000) % personalities.length];
+  const d = DIALOGUES[pick] || DIALOGUES.mystic;
+  let pool;
+  if(taskCount===0)      pool = d.idle;
+  else if(taskCount<=3)  pool = d.few;
+  else if(taskCount<=5)  pool = d.half;
+  else if(taskCount<=7)  pool = d.most;
+  else                   pool = d.all;
+  const idx = (Math.floor(Date.now()/120000) + dialogueTapOffset) % pool.length;
+  return pool[idx];
+}
+
+function tapCharacter(){
+  dialogueTapOffset++;
+  const el = document.getElementById('home-speech');
+  el.style.transition = 'opacity .15s';
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = getDialogue(S.daily.done.length);
+    el.style.opacity = '1';
+  }, 150);
+  // little bounce on avatar
+  const wrap = document.getElementById('home-avatar-wrap');
+  wrap.style.transform = 'scale(1.08)';
+  setTimeout(() => wrap.style.transform = '', 200);
+}
+
+function tapCompanion(){
+  const zone = document.getElementById('char-img-zone');
+  if(!zone) return;
+  const personalities = S.character.personalities || [S.character.personality || 'mystic'];
+  const emojis = personalities.map(id => {
+    const p = PERSONALITIES.find(x => x.id === id);
+    return p ? p.icon : null;
+  }).filter(Boolean);
+  if(!emojis.length) return;
+  // bounce the avatar
+  const wrap = document.getElementById('char-avatar-wrap');
+  wrap.style.transition = 'transform .2s cubic-bezier(.17,.67,.3,1.5)';
+  wrap.style.transform = 'scale(1.1)';
+  setTimeout(() => wrap.style.transform = '', 220);
+  // spawn 10 of each emoji, falling from zone top to bottom of viewport
+  const rect = zone.getBoundingClientRect();
+  const startY = rect.top + 20;
+  const fallDist = window.innerHeight - startY + 40;
+  emojis.forEach((icon, ei) => {
+    for(let i = 0; i < 10; i++){
+      const el = document.createElement('span');
+      el.className = 'pers-fall-emoji';
+      el.textContent = icon;
+      const x = rect.left + Math.random() * (rect.width - 28);
+      const dur = (1.0 + Math.random() * 0.7).toFixed(2);
+      const delay = (ei * 0.05 + i * 0.07 + Math.random() * 0.05).toFixed(2);
+      const rot = ((Math.random() - 0.5) * 50).toFixed(1);
+      el.style.cssText = `left:${x}px;top:${startY}px;--fd:${fallDist}px;--dur:${dur}s;--delay:${delay}s;--er:${rot}deg;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), (parseFloat(dur) + parseFloat(delay)) * 1000 + 150);
+    }
+  });
+}
+
+const DAILY_QUOTES=[
+  "It's okay not to have it all figured out. You don't have to see the whole staircase, just take the first step.",
+  "Do what you can, with what you have, where you are.",
+  "You are braver than you believe, stronger than you seem, and smarter than you think.",
+  "No one is useless in this world who lightens the burdens of another.",
+  "There is no exercise better for the heart than reaching down and lifting people up.",
+  "Act as if what you do makes a difference. It does.",
+  "Hard days are the best because that's when champions are made.",
+  "Every flower must grow through dirt.",
+  "Promise me you'll always remember: You're braver than you believe, and stronger than you seem, and smarter than you think.",
+  "Believe you can and you're halfway there.",
+  "No one can make you feel inferior without your consent.",
+  "You change your life by changing your heart.",
+  "The only way to do great work is to love what you do.",
+  "It always seems impossible until it's done.",
+  "Keep your face always toward the sunshine, and shadows will fall behind you.",
+  "Wherever you go, go with all your heart.",
+  "The best way to predict the future is to create it.",
+  "Write it on your heart that every day is the best day in the year.",
+  "The only limit to our realization of tomorrow will be our doubts of today.",
+  "Fall seven times, stand up eight.",
+  "The most wasted of all days is one without laughter.",
+  "Happiness is not something ready-made. It comes from your own actions.",
+];
+
+function getDailyQuoteIndex(){
+  const d=new Date();
+  const seed=(d.getFullYear()*10000+( d.getMonth()+1)*100+d.getDate());
+  return seed%DAILY_QUOTES.length;
+}
+
+function renderHome(){
+  const {avatar,name}=S.character;
+  const personalities = S.character.personalities || [S.character.personality || 'mystic'];
+  const persObjs = personalities.map(id => PERSONALITIES.find(p => p.id === id)).filter(Boolean);
+  const classLabel = persObjs.map(p => p.icon + ' ' + p.name).join('  ·  ');
+  document.getElementById('home-avatar-wrap').innerHTML=avatarHTML(avatar,'home-char-img');
+  document.getElementById('home-name').textContent=name;
+  document.getElementById('home-class').textContent=classLabel;
+  document.getElementById('home-speech').textContent=getDialogue(S.daily.done.length);
+  document.getElementById('h-streak').textContent=S.streak;
+  document.getElementById('h-stickers').textContent=S.stickers;
+  document.getElementById('h-tasks').textContent=S.totalTasksDone;
+
+  // Daily quote
+  const qIdx=getDailyQuoteIndex();
+  document.getElementById('daily-quote-text').textContent=`"${DAILY_QUOTES[qIdx]}"`;
+  document.getElementById('daily-quote-pips').innerHTML=
+    DAILY_QUOTES.map((_,i)=>`<div class="dq-pip${i===qIdx?' active':''}"></div>`).join('');
+
+  // Pity bars
+  const legPct=(S.pity.leg/PITY_LEG)*100;
+  const mythPct=(S.pity.myth/PITY_MYTH)*100;
+  document.getElementById('pity-leg-bar').style.width=Math.min(legPct,100)+'%';
+  document.getElementById('pity-myth-bar').style.width=Math.min(mythPct,100)+'%';
+  document.getElementById('pity-leg-txt').textContent=
+    S.pity.leg>=PITY_LEG?'GUARANTEED NOW!':`${PITY_LEG-S.pity.leg} pulls away`;
+  document.getElementById('pity-myth-txt').textContent=
+    S.pity.myth>=PITY_MYTH?'GUARANTEED NOW!':`${PITY_MYTH-S.pity.myth} pulls away`;
+
+  const done=S.daily.done.length;
+  const earned=getPullsEarned();
+  document.getElementById('home-today-summary').innerHTML=
+    done===0?'No tasks completed yet today. Head to Tasks to begin!'
+    :`<b>${done}/10</b> tasks done today · <b>${earned}</b> pull${earned!==1?'s':''} earned
+      ${getPullsAvailable()>0?` · <span style="color:var(--gold)"><b>${getPullsAvailable()} ready to claim!</b></span>`:''}`;
+}
+
+function renderTasks(){
+  const pool=S.daily.pool.map(id=>ALL_TASKS.find(t=>t.id===id)).filter(Boolean);
+  const done=S.daily.done;
+  const pips=document.getElementById('task-pip-row');
+  pips.innerHTML=Array.from({length:10},(_,i)=>{
+    const isDone=i<done.length;
+    const isReq=i<3;
+    return `<div class="tp-pip ${isDone?(isReq?'req-done':'bonus-done'):''}"></div>`;
+  }).join('');
+  const refreshesLeft=S.daily.refreshesLeft??3;
+  document.getElementById('task-need-lbl').textContent=
+    done.length>=3?`✅ ${done.length}/10 done`:`${done.length}/3 done`;
+  document.getElementById('task-refresh-lbl').textContent=
+    `🔄 ${refreshesLeft} refresh${refreshesLeft===1?'':'es'} left`;
+  document.getElementById('task-refresh-lbl').style.opacity=refreshesLeft>0?'1':'0.4';
+
+  document.getElementById('task-list').innerHTML=pool.map((t,i)=>{
+    const isDone=done.includes(t.id);
+    const isBonus=i>=3&&isDone;
+    const isReq=i<3;
+    const canRefresh=!isDone&&refreshesLeft>0;
+    return `<div class="task-item ${isDone?(isBonus?'bonus-done':'done'):''}" onclick="openVerify('${t.id}')">
+      <div class="task-icon">${t.icon}</div>
+      <div class="task-info">
+        <div class="task-name">${t.name} ${isReq&&!isDone?'<span style="font-size:0.65rem;color:var(--rose);font-family:\'Comic Neue\'">(required)</span>':''}</div>
+        <div class="task-desc">${t.desc}</div>
+      </div>
+      <div class="task-cat ${t.cat}">${t.cat}</div>
+      ${isDone
+        ?'<div class="task-check">✓</div>'
+        :`<button class="task-refresh-btn${canRefresh?'':' disabled'}" onclick="refreshTask('${t.id}',event)" title="Swap this task"
+           ${canRefresh?'':'disabled'}>🔄</button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+function renderCharacterPage(){
+  const {avatar,name}=S.character;
+  document.getElementById('char-avatar-wrap').innerHTML=avatarHTML(avatar,'char-img');
+  document.getElementById('char-name-big').textContent=name;
+  document.getElementById('char-speech-big').textContent=`"${getDialogue(S.daily.done.length)}"`;
+  const avail=getPullsAvailable();
+  const earned=getPullsEarned();
+  const claimed=S.daily.claimedPulls;
+  document.getElementById('pulls-avail').textContent=avail;
+  document.getElementById('pulls-total').textContent=S.totalPulls;
+  document.getElementById('pulls-today-done').textContent=S.daily.done.length;
+
+  // Render pull tickets
+  const dateStr=new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  let ticketsHTML='';
+  if(isAdmin()){
+    ticketsHTML=`<div class="ticket" onclick="claimSinglePull()">
+      <div class="ticket-stripe" style="background:linear-gradient(180deg,#C4935A,#A06830)"></div>
+      <div class="ticket-body">
+        <div class="ticket-header" style="color:var(--gold)">👑 ADMIN · Daily Quest</div>
+        <div class="ticket-title">∞ Unlimited Pulls</div>
+        <div class="ticket-sub">${dateStr} · Tap to pull!</div>
+      </div>
+      <div class="ticket-perf"></div>
+      <div class="ticket-right">
+        <div class="ticket-right-icon">♾️</div>
+        <div class="ticket-right-label">Pull</div>
+      </div>
+      <div class="ticket-stamp-wrap"><div class="ticket-stamp"></div></div>
+    </div>`;
+  } else if(earned>0){
+    for(let i=0;i<earned;i++){
+      const used=i<claimed;
+      const num=String(i+1).padStart(3,'0');
+      ticketsHTML+=`<div class="ticket${used?' ticket-dim no-cursor':''}" onclick="${used?'':'claimSinglePull()'}">
+        <div class="ticket-stripe${used?' gray':''}"></div>
+        <div class="ticket-body">
+          <div class="ticket-header">✨ Daily Quest · Companion</div>
+          <div class="ticket-title">🎲 Pull Ticket</div>
+          <div class="ticket-sub">No.${num} · ${dateStr} · ${used?'Used':'Tap to pull!'}</div>
+        </div>
+        <div class="ticket-perf"></div>
+        <div class="ticket-right">
+          <div class="ticket-right-icon">🎁</div>
+          <div class="ticket-right-label">${used?'Done':'Pull'}</div>
+        </div>
+        <div class="ticket-stamp-wrap"><div class="ticket-stamp${used?' visible':''}">USED</div></div>
+      </div>`;
+    }
+  } else {
+    ticketsHTML=`<div class="ticket-empty-msg">🎯 Complete 3 tasks today to earn a pull ticket!</div>`;
+  }
+  // Sticker-buy ticket (always shown)
+  const stickerCost=10;
+  const canBuy=isAdmin()||S.stickers>=stickerCost;
+  ticketsHTML+=`<div class="ticket sticker-pull-ticket${canBuy?'':' ticket-dim no-cursor'}" onclick="${canBuy?'stickerPull()':''}">
+    <div class="ticket-stripe rose"></div>
+    <div class="ticket-body">
+      <div class="ticket-header">${isAdmin()?'👑 Admin Exchange':'🏷️ Sticker Exchange'}</div>
+      <div class="ticket-title">✨ Buy a Pull</div>
+      <div class="ticket-sub">${isAdmin()?'Free for admin · Unlimited!':'Costs '+stickerCost+' stickers · You have '+S.stickers}</div>
+    </div>
+    <div class="ticket-perf"></div>
+    <div class="ticket-right">
+      <div class="ticket-right-icon">${canBuy?'🏷️':'🔒'}</div>
+      <div class="ticket-right-label">${isAdmin()?'♾️':''+stickerCost+' 🏷️'}</div>
+    </div>
+  </div>`;
+
+  document.getElementById('tickets-section').innerHTML=`
+    <div class="tickets-label">Pull Tickets</div>
+    <div class="ticket-list">${ticketsHTML}</div>`;
+
+  const rates=calcRates();
+  const tierOrder=['common','uncommon','rare','epic','legendary','mythic'];
+  document.getElementById('rates-grid').innerHTML=tierOrder.map(t=>{
+    const tier=TIERS[t];
+    return `<div class="rate-chip bg-${t}">
+      <div class="rc-tier" style="color:${tier.color}">${tier.name}</div>
+      <div class="rc-val" style="color:${tier.textColor}">${(rates[t]*100).toFixed(1)}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── THEMES ───────────────────────────────────────────────────────────────────
+
+const THEMES=[
+  {id:'sage',  name:'Sage Teal',   swatch:'#97B3AE',
+   vars:{'--bg':'#F5F0EB','--bg2':'#EDE5DC','--bg3':'#E6DDD4','--card':'#FDFAF7','--card2':'#F5EEE7','--border':'#D6CBBF','--teal':'#97B3AE','--teal2':'#6A9A94',
+         '--zone-bg':'linear-gradient(170deg,#B8CEC9 0%,#CCDAD7 60%,#B0C8C4 100%)'}},
+  {id:'mint',  name:'Mint Green',  swatch:'#D2E0D3',
+   vars:{'--bg':'#F2F7F2','--bg2':'#E8F0E8','--bg3':'#DDE8DD','--card':'#F8FCF8','--card2':'#EEF6EE','--border':'#C0D4C0','--teal':'#7AA87A','--teal2':'#4A8A4A',
+         '--zone-bg':'linear-gradient(170deg,#C4D9C5 0%,#D8E8D8 60%,#BCE0BC 100%)'}},
+  {id:'blush', name:'Blush Pink',  swatch:'#F0DDD6',
+   vars:{'--bg':'#FBF5F3','--bg2':'#F5EBE8','--bg3':'#EEE2DE','--card':'#FDF9F8','--card2':'#F8F0EE','--border':'#DEC8C2','--teal':'#C87A70','--teal2':'#A05048',
+         '--zone-bg':'linear-gradient(170deg,#EDD4CC 0%,#F4E0DA 60%,#E6CCCA 100%)'}},
+  {id:'rose',  name:'Dusty Rose',  swatch:'#F2C3B9',
+   vars:{'--bg':'#FCF5F2','--bg2':'#F6EAE6','--bg3':'#F0E0DC','--card':'#FEF8F6','--card2':'#F8EEE8','--border':'#E0C0B8','--teal':'#D47A6A','--teal2':'#B05848',
+         '--zone-bg':'linear-gradient(170deg,#ECC0B5 0%,#F4CCBF 60%,#E6B4AB 100%)'}},
+  {id:'beige', name:'Warm Beige',  swatch:'#D6CBBF',
+   vars:{'--bg':'#F8F4F0','--bg2':'#EEE8E0','--bg3':'#E8E0D8','--card':'#FBF8F4','--card2':'#F4F0E8','--border':'#CCC0B0','--teal':'#A08870','--teal2':'#806050',
+         '--zone-bg':'linear-gradient(170deg,#CBC0B4 0%,#DAD2C8 60%,#C4BAAE 100%)'}},
+  {id:'cream', name:'Soft Cream',  swatch:'#F0EEEA',
+   vars:{'--bg':'#FAFAF8','--bg2':'#F4F2EE','--bg3':'#ECEAE6','--card':'#FDFCFA','--card2':'#F8F6F2','--border':'#D8D4CE','--teal':'#A09888','--teal2':'#806A5A',
+         '--zone-bg':'linear-gradient(170deg,#E5E2DC 0%,#EEECEA 60%,#DDD9D4 100%)'}},
+];
+
+let selTheme='sage';
+
+function buildThemeGrid(){
+  document.getElementById('theme-grid').innerHTML=THEMES.map(t=>`
+    <div class="theme-btn${selTheme===t.id?' sel':''}" onclick="pickTheme('${t.id}')">
+      <div class="theme-swatch" style="background:${t.swatch}"></div>
+      <div class="theme-name">${t.name}</div>
+    </div>`).join('');
+  applyThemeById(selTheme);
+}
+
+function pickTheme(id){
+  selTheme=id;
+  document.querySelectorAll('.theme-btn').forEach(b=>b.classList.remove('sel'));
+  document.querySelectorAll('.theme-btn').forEach((b,i)=>{if(THEMES[i].id===id)b.classList.add('sel');});
+  applyThemeById(id);
+}
+
+function applyThemeById(id){
+  const t=THEMES.find(x=>x.id===id)||THEMES[0];
+  Object.entries(t.vars).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+}
+
+// ─── ACCESSORY DISPLAY ────────────────────────────────────────────────────────
+
+const SLOT_LABELS={title:'Title',bg:'Background',frame:'Frame',aura:'Aura',badge:'Badge'};
+
+function _applyAcc(){
+  const eq=S.equippedAcc||{};
+  // Background zones
+  const bgItem=eq.bg?DAILY_SHOP_POOL.find(i=>i.id===eq.bg):null;
+  [document.querySelector('.home-char-img-zone'),document.querySelector('.char-img-zone')].forEach(el=>{
+    if(el)el.style.background=bgItem?bgItem.bg:'';
+  });
+  // Frame border
+  const frameItem=eq.frame?DAILY_SHOP_POOL.find(i=>i.id===eq.frame):null;
+  const homeCard=document.querySelector('.home-char-card');
+  if(homeCard)homeCard.style.borderColor=frameItem?frameItem.frameColor:'';
+  const charCard=document.querySelector('#page-character .card');
+  if(charCard)charCard.style.borderColor=frameItem?frameItem.frameColor:'';
+  // Aura filter
+  const auraItem=eq.aura?DAILY_SHOP_POOL.find(i=>i.id===eq.aura):null;
+  const baseFilter='drop-shadow(0 6px 14px rgba(100,70,50,.18))';
+  setTimeout(()=>{
+    ['.home-char-img','.home-char-avatar','.char-img','.char-big-avatar'].forEach(sel=>{
+      const el=document.querySelector(sel);
+      if(el)el.style.filter=auraItem?`${baseFilter} ${auraItem.auraCSS}`:baseFilter;
+    });
+  },60);
+  // Badge next to name
+  const badgeItem=eq.badge?DAILY_SHOP_POOL.find(i=>i.id===eq.badge):null;
+  const badge=badgeItem?` <span style="font-size:1rem">${badgeItem.icon}</span>`:'';
+  const hn=document.getElementById('home-name');
+  const cn=document.getElementById('char-name-big');
+  if(hn)hn.innerHTML=S.character.name+badge;
+  if(cn)cn.innerHTML=S.character.name+badge;
+  // Title under name
+  const titleItem=eq.title?DAILY_SHOP_POOL.find(i=>i.id===eq.title):null;
+  ['home-acc-title','char-acc-title'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(isAdmin())el.textContent='👑 Admin';
+    else el.textContent=titleItem?titleItem.label:'';
+  });
+}
+
+const DEALER_LINES=[
+  '"Welcome to the café! ✨ What can I get for you today~"',
+  '"Today\'s specials just came out of the oven! 🍞"',
+  '"Sit down, take a rest — you\'ve earned it! ☕"',
+  '"Psst... the legendary items smell amazing today~ 🌟"',
+  '"Spend those stickers wisely, dear~ 🏷️"',
+  '"Every item here is made with lots of love! 🎀"',
+  '"A new adventurer! I love the energy~ ⚡"',
+  '"The rare pulls are calling your name today... 🔮"',
+  '"Meow~ Don\'t be shy, take a look around! 🐱"',
+  '"My counter is always open for you, friend~ 🛍️"',
+  '"Ooh, I just restocked the good stuff! 💫"',
+  '"Between you and me? Today\'s your lucky day~ 🍀"',
+  '"I brewed a fresh pot just for you! ☕✨"',
+  '"That item you\'re eyeing... it suits you perfectly~ 🌸"',
+  '"Every purchase comes with extra good vibes! 🎶"',
+  '"The mythic shelf is looking extra shiny today~ 💎"',
+  '"You\'ve been working so hard! Treat yourself~ 🎁"',
+  '"Streaks are currency here too, you know~ 🔥"',
+  '"I\'ve been saving this one just for you! 🌟"',
+  '"Nothing makes me happier than a happy customer~ 🐾"',
+  '"The pity counter doesn\'t stand a chance against you! ⚔️"',
+  '"Fresh from the back room — just for the best visitors~ 🎀"',
+  '"You have excellent taste, by the way~ ✨"',
+  '"Come back tomorrow — I\'ll have something special! 🌙"',
+];
+
+let dealerTapOffset=0;
+function tapDealer(){
+  dealerTapOffset++;
+  const el=document.getElementById('dealer-speech');
+  if(!el)return;
+  el.style.transition='opacity .12s';
+  el.style.opacity='0';
+  setTimeout(()=>{
+    el.textContent=DEALER_LINES[(Math.floor(Date.now()/30000)+dealerTapOffset)%DEALER_LINES.length];
+    el.style.opacity='1';
+  },120);
+}
+
+function refreshShopStock(){
+  const left=S.daily.stockRefreshesLeft??3;
+  if(left<=0){showToast('No stock refreshes left today!');return;}
+  // Re-roll all stock using a time-salt so it differs from the original daily roll
+  const today=todayStr();
+  const salt=Date.now().toString(36);
+  function _itemRandSalted(id){
+    const str=id+today+salt;
+    let h=2166136261>>>0;
+    for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),16777619)>>>0;}
+    return (h>>>0)/4294967296;
+  }
+  function _stockVal(id,cost){
+    const f=_itemRandSalted(id);
+    if(cost>=25) return f<0.5?0:1+Math.floor((f-0.5)*6);
+    return 5+Math.floor(f*6);
+  }
+  const newShopStock={};
+  STICKER_SHOP.forEach(item=>{
+    const prev=(S.daily.shopStock||{})[item.id]||{sold:0};
+    const newMax=_stockVal(item.id,item.cost);
+    newShopStock[item.id]={max:newMax,sold:Math.min(prev.sold,newMax)};
+  });
+  const newDailyStock={};
+  DAILY_SHOP_POOL.forEach(item=>{
+    const prev=(S.daily.dailyStock||{})[item.id]||{sold:0};
+    const newMax=_stockVal(item.id,item.cost);
+    newDailyStock[item.id]={max:newMax,sold:Math.min(prev.sold,newMax)};
+  });
+  S.daily.shopStock=newShopStock;
+  S.daily.dailyStock=newDailyStock;
+  S.daily.stockRefreshesLeft=left-1;
+  save();renderAll();
+  showToast(`🔄 Stock refreshed! ${S.daily.stockRefreshesLeft} refresh${S.daily.stockRefreshesLeft===1?'':'es'} left today`);
+}
+
+function renderShop(){
+  document.getElementById('shop-stickers').textContent=S.stickers;
+  document.getElementById('shop-points').textContent=S.dailyPoints;
+  const srLeft=S.daily.stockRefreshesLeft??3;
+  const srBtn=document.getElementById('shop-stock-refresh-btn');
+  const srLbl=document.getElementById('stock-refresh-lbl');
+  if(srBtn){srBtn.disabled=srLeft<=0;srBtn.title=`Refresh all stock (${srLeft} left today)`;}
+  if(srLbl)srLbl.textContent=srLeft;
+  const dl=document.getElementById('dealer-speech');
+  if(dl)dl.textContent=DEALER_LINES[(Math.floor(Date.now()/30000)+dealerTapOffset)%DEALER_LINES.length];
+
+  const shopStock=S.daily.shopStock||{};
+  document.getElementById('sticker-shop-content').innerHTML=[...STICKER_SHOP].sort((a,b)=>a.cost-b.cost).map(item=>{
+    const s=shopStock[item.id];
+    const remaining=s?s.max-s.sold:0;
+    const outOfStock=remaining<=0;
+    const stockColor=remaining<=2?'var(--rose)':remaining<=5?'var(--gold)':'var(--text3)';
+    return `<div class="shop-item${!isAdmin()&&outOfStock?' shop-item-oos':''}">
+      <div class="shop-item-icon">${item.icon}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${item.name}</div>
+        <div class="shop-item-desc">${item.desc}</div>
+        <div style="font-size:0.65rem;font-weight:700;color:${isAdmin()?'var(--gold)':stockColor};margin-top:3px;">
+          ${isAdmin()?'♾️ Unlimited (Admin)':outOfStock?'✕ Out of stock':remaining+' left today'}
+        </div>
+      </div>
+      <button class="btn btn-teal-light btn-sm" onclick="buyStickerShop('${item.id}')"
+        ${!isAdmin()&&(outOfStock||S.stickers<item.cost)?'disabled':''}>
+        <span class="currency-badge cur-sticker">${isAdmin()?'👑 Free':'🏷️ '+item.cost}</span>
+      </button>
+    </div>`;
+  }).join('');
+
+  const daily=getDailyShopItems();
+  const eq=S.equippedAcc||{};
+  const owned=S.accessories||[];
+  const dailyStock=S.daily.dailyStock||{};
+  const slots=['title','bg','frame','aura','badge'];
+  let dailyHTML=`<div style="font-size:0.72rem;color:var(--text3);margin-bottom:10px;background:var(--bg3);border-radius:8px;padding:8px 12px;border:1px solid var(--border)">
+    ✨ Spend <b>Daily Points</b> on accessories for your companion · Equip them from My Items
+  </div>`;
+  slots.forEach(slot=>{
+    const items=daily.filter(i=>i.slot===slot);
+    if(!items.length)return;
+    dailyHTML+=`<div style="font-size:0.72rem;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;margin:14px 0 6px;padding-top:4px;border-top:1px solid var(--border)">${SLOT_LABELS[slot]||slot}</div>`;
+    dailyHTML+=items.map(item=>{
+      const isOwned=owned.includes(item.id);
+      const isEq=eq[slot]===item.id;
+      const ds=dailyStock[item.id];
+      const remaining=ds?ds.max-ds.sold:0;
+      const oos=!isOwned&&remaining<=0;
+      const stockColor=remaining<=1?'var(--rose)':remaining<=2?'var(--gold)':'var(--text3)';
+      if(isOwned){
+        return `<div class="shop-item" style="opacity:0.9">
+          <div class="shop-item-icon">${item.icon}</div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">${item.name}</div>
+            <div class="shop-item-desc" style="color:var(--teal)">${isEq?'✓ Equipped':'Owned — equip from My Items'}</div>
+          </div>
+          <button class="btn ${isEq?'btn-outline':'btn-teal-light'} btn-sm" onclick="toggleEquipAcc('${item.id}')">
+            ${isEq?'Unequip':'Equip'}
+          </button>
+        </div>`;
+      }
+      return `<div class="shop-item${!isAdmin()&&oos?' shop-item-oos':''}">
+        <div class="shop-item-icon">${item.icon}</div>
+        <div class="shop-item-info">
+          <div class="shop-item-name">${item.name}</div>
+          <div style="font-size:0.65rem;font-weight:700;color:${isAdmin()?'var(--gold)':oos?'var(--rose)':stockColor};margin-top:3px;">
+            ${isAdmin()?'♾️ Unlimited (Admin)':oos?'✕ Out of stock today':remaining+' left today'}
+          </div>
+        </div>
+        <button class="btn btn-gold-light btn-sm" onclick="buyDailyShop('${item.id}')" ${!isAdmin()&&(oos||S.dailyPoints<item.cost)?'disabled':''}>
+          <span class="currency-badge cur-points">${isAdmin()?'👑 Free':'⭐ '+item.cost}</span>
+        </button>
+      </div>`;
+    }).join('');
+  });
+  document.getElementById('daily-shop-content').innerHTML=dailyHTML;
+}
+
+function _buildInvItemHTML(i){
+  const item=ITEMS.find(it=>it.id===i.id);
+  if(!item)return '';
+  const tier=TIERS[item.tier];
+  const isOneUse=item.eff&&['stickers','pityReduce','pityHalve','pityReset'].includes(item.eff.type);
+  const ml=i.mergeLevel||0;
+  const stars=ml>0?`<span style="color:#C48820;font-size:0.75rem;letter-spacing:1px;display:block;margin:1px 0">${'★'.repeat(ml)} Merged${ml>1?' (Lv.'+ml+')':''}</span>`:'';
+  let mergedDesc=item.desc;
+  if(ml>0&&item.eff&&item.eff.val){
+    const scaledVal=getMergedVal(item.eff.val,ml);
+    const pct=Math.round(scaledVal*100);
+    const {type}=item.eff;
+    if(type==='dropBoost')mergedDesc=`All drops +${pct}% (${ml+1}× base)`;
+    else if(type==='rareBoost')mergedDesc=`Rare+ drops +${pct}% (${ml+1}× base)`;
+    else if(type==='epicBoost')mergedDesc=`Epic+ drops +${pct}% (${ml+1}× base)`;
+    else if(type==='legendBoost')mergedDesc=`Leg+ drops +${pct}% (${ml+1}× base)`;
+  }
+  const borderColor=ml>0?'#C48820':i.equipped?'var(--teal)':tier.color+'50';
+  const mergeGlow=ml>0?`box-shadow:0 0 10px ${tier.color}60;`:'';
+  return `<div class="inv-item ${i.equipped?'equipped':''}" style="border-color:${borderColor};${mergeGlow}">
+    ${i.equipped?'<div class="equipped-badge">Equipped</div>':''}
+    ${ml>0?`<div style="position:absolute;top:4px;right:6px;font-size:0.65rem;background:#C48820;color:#fff;border-radius:6px;padding:1px 5px">✦ Lv.${ml}</div>`:''}
+    <span class="inv-item-icon">${item.icon}</span>
+    <span class="inv-item-name">${item.name}</span>
+    ${stars}
+    <div style="display:flex;align-items:center;justify-content:center;margin:3px 0;">
+      <div class="tier-dot" style="background:${tier.color}"></div>
+      <span class="inv-item-tier" style="color:${tier.color}">${tier.name}</span>
+    </div>
+    <div class="inv-item-desc">${mergedDesc}</div>
+    <button class="btn ${isOneUse?'btn-gold':'btn-teal'} btn-sm" style="font-size:0.7rem;padding:5px 10px;"
+      onclick="toggleEquip(${i.instanceId})">
+      ${isOneUse?'Use Now ✨':(i.equipped?'Unequip':'Equip')}
+    </button>
+  </div>`;
+}
+
+function renderInventory(){
+  const inv=S.inventory;
+  document.getElementById('inv-empty').classList.toggle('hidden',inv.length>0);
+  document.getElementById('inv-grid').classList.toggle('hidden',inv.length===0);
+  const TIER_ORDER=['common','uncommon','rare','epic','legendary','mythic'];
+  let html='';
+  TIER_ORDER.forEach(tierKey=>{
+    const group=inv.filter(i=>{const it=ITEMS.find(x=>x.id===i.id);return it&&it.tier===tierKey;});
+    if(!group.length)return;
+    const tier=TIERS[tierKey];
+    html+=`<div style="grid-column:1/-1;text-align:center;margin:14px 0 6px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:${tier.color};background:${tier.bg};border:1.5px solid ${tier.color}40;border-radius:20px;padding:3px 14px;">
+        <span style="width:8px;height:8px;border-radius:50%;background:${tier.color};display:inline-block;"></span>${tier.name}
+      </span>
+    </div>`;
+    html+=group.map(i=>_buildInvItemHTML(i)).join('');
+  });
+  document.getElementById('inv-grid').innerHTML=html;
+
+  // Accessories section
+  const owned=(S.accessories||[]);
+  const eq=S.equippedAcc||{};
+  const accSection=document.getElementById('acc-section');
+  const accEmpty=document.getElementById('acc-empty');
+  if(!accSection)return;
+  if(owned.length===0){
+    accSection.classList.add('hidden');
+    accEmpty.classList.remove('hidden');
+    return;
+  }
+  accSection.classList.remove('hidden');
+  accEmpty.classList.add('hidden');
+  const slots=['title','bg','frame','aura','badge'];
+  let html='';
+  slots.forEach(slot=>{
+    const items=owned.map(id=>DAILY_SHOP_POOL.find(i=>i.id===id)).filter(i=>i&&i.slot===slot);
+    if(items.length===0)return;
+    html+=`<div style="grid-column:1/-1;text-align:center;margin:14px 0 6px;"><span style="display:inline-block;font-size:0.72rem;font-weight:700;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;background:var(--bg3);border:1.5px solid var(--border);border-radius:20px;padding:3px 14px;">${SLOT_LABELS[slot]||slot}</span></div>`;
+    html+=items.map(item=>{
+      const isEq=eq[slot]===item.id;
+      return `<div class="inv-item${isEq?' equipped':''}" style="border-color:${isEq?'var(--teal)':'var(--border)'}">
+        ${isEq?'<div class="equipped-badge">Equipped</div>':''}
+        <span class="inv-item-icon">${item.icon}</span>
+        <span class="inv-item-name">${item.name}</span>
+        <button class="btn ${isEq?'btn-outline':'btn-teal'} btn-sm" style="font-size:0.7rem;padding:5px 10px;margin-top:4px;"
+          onclick="toggleEquipAcc('${item.id}')">
+          ${isEq?'Unequip':'Equip'}
+        </button>
+      </div>`;
+    }).join('');
+  });
+  document.getElementById('acc-grid').innerHTML=html;
+}
+
+// ─── UI HELPERS ───────────────────────────────────────────────────────────────
+
+function gotoPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  document.getElementById('main').scrollTop=0;
+  if(name==='character')renderCharacterPage();
+  if(name==='shop')renderShop();
+}
+
+let toastT;
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ─── FIREBASE CONFIG ──────────────────────────────────────────────────────────
+// Paste your Firebase Realtime Database URL here after setup (see deploy instructions).
+// Example: 'https://your-project-default-rtdb.firebaseio.com'
+const FIREBASE_URL = '';
+
+// ─── LEADERBOARD ──────────────────────────────────────────────────────────────
+
+function _lbEntry(){
+  return {
+    name:S.character.name,
+    avatar:S.character.avatar,
+    gender:S.character.gender||'neutral',
+    stickers:S.stickers,
+    tasks:S.totalTasksDone,
+    streak:S.streak,
+    bestStreak:S.bestStreak||0,
+    lastSeen:Date.now(),
+  };
+}
+
+function syncLeaderboard(){
+  if(!S.created||!S.character.name)return;
+  if(isAdmin())return;
+  const entry=_lbEntry();
+  // Always keep local copy as fallback
+  const lb=JSON.parse(localStorage.getItem('dqLeaderboard')||'{}');
+  lb[S.playerId]=entry;
+  localStorage.setItem('dqLeaderboard',JSON.stringify(lb));
+  // Push to Firebase if configured
+  if(!FIREBASE_URL)return;
+  fetch(`${FIREBASE_URL}/leaderboard/${S.playerId}.json`,{
+    method:'PUT',
+    body:JSON.stringify(entry),
+    headers:{'Content-Type':'application/json'}
+  }).catch(()=>{});
+}
+
+let _lbCat='stickers';
+let _lbCache=null;
+
+function openLeaderboard(){
+  syncLeaderboard();
+  _lbCat='stickers';
+  ['stickers','tasks','streak'].forEach(c=>
+    document.getElementById('lbt-'+c).classList.toggle('active',c==='stickers'));
+  document.getElementById('lb-panel').classList.remove('hidden');
+  _fetchAndRenderLeaderboard();
+}
+
+function closeLeaderboard(){
+  document.getElementById('lb-panel').classList.add('hidden');
+}
+
+function lbTab(cat){
+  _lbCat=cat;
+  ['stickers','tasks','streak'].forEach(c=>
+    document.getElementById('lbt-'+c).classList.toggle('active',c===cat));
+  _renderLbEntries(_lbCache||{});
+}
+
+function _fetchAndRenderLeaderboard(){
+  if(!FIREBASE_URL){
+    const lb=JSON.parse(localStorage.getItem('dqLeaderboard')||'{}');
+    _lbCache=lb;
+    _renderLbEntries(lb);
+    return;
+  }
+  document.getElementById('lb-list').innerHTML=
+    `<div class="lb-empty" style="padding:24px 0">⏳ Loading global scores…</div>`;
+  fetch(`${FIREBASE_URL}/leaderboard.json`)
+    .then(r=>r.json())
+    .then(data=>{
+      const merged=JSON.parse(localStorage.getItem('dqLeaderboard')||'{}');
+      if(data&&typeof data==='object')Object.assign(merged,data);
+      _lbCache=merged;
+      _renderLbEntries(merged);
+    })
+    .catch(()=>{
+      const lb=JSON.parse(localStorage.getItem('dqLeaderboard')||'{}');
+      _lbCache=lb;
+      _renderLbEntries(lb);
+    });
+}
+
+function _renderLbEntries(lb){
+  const entries=Object.entries(lb).map(([id,e])=>({id,...e})).filter(e=>e.name!=='BAM_doakkaebi');
+  if(entries.length===0){
+    document.getElementById('lb-list').innerHTML=
+      `<div class="lb-empty">No players yet!<br><br>Complete tasks to appear on the board. 🌟</div>`;
+    return;
+  }
+  const key=_lbCat==='stickers'?'stickers':_lbCat==='tasks'?'tasks':'bestStreak';
+  entries.sort((a,b)=>(b[key]||0)-(a[key]||0));
+  const medals=['🥇','🥈','🥉'];
+  document.getElementById('lb-list').innerHTML=entries.map((e,i)=>{
+    const isMe=e.id===S.playerId;
+    const rank=i<3?medals[i]:`<span style="font-size:0.78rem;color:var(--text3)">#${i+1}</span>`;
+    const score=_lbCat==='stickers'
+      ?`🏷️ ${e.stickers||0}`
+      :_lbCat==='tasks'
+      ?`✅ ${e.tasks||0}`
+      :`🔥 ${e.bestStreak||0}`;
+    const imgSrc=IMAGE_AVATARS[e.avatar]?getAvatarSrc(e.avatar,e.gender||'neutral'):null;
+    const avatarInner=imgSrc
+      ?`<img src="${imgSrc}" onerror="this.outerHTML='${e.avatar||'🧚'}'"/>`
+      :(e.avatar||'🧚');
+    return `<div class="lb-entry${isMe?' me':''}">
+      <div class="lb-rank">${rank}</div>
+      <div class="lb-avatar">${avatarInner}</div>
+      <div class="lb-info">
+        <div class="lb-name">${e.name}${isMe?'<span style="font-size:0.58rem;color:var(--teal2);margin-left:4px;">you</span>':''}</div>
+        <div class="lb-sub">${_lbTimeAgo(e.lastSeen)}</div>
+      </div>
+      <div class="lb-score">${score}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderLeaderboard(){_fetchAndRenderLeaderboard();}
+
+function _lbTimeAgo(ts){
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return 'just now';
+  if(s<3600)return `${Math.floor(s/60)}m ago`;
+  if(s<86400)return `${Math.floor(s/3600)}h ago`;
+  return `${Math.floor(s/86400)}d ago`;
+}
+
+// ─── SINGLE / STICKER PULLS ──────────────────────────────────────────────────
+
+function _doPull(){
+  const rates=calcRates();
+  const tier=rollTier(rates);
+  const item=pickItemOfTier(tier);
+  pullQueue=[item];
+  S.pity.leg++;S.pity.myth++;
+  if(tier==='legendary'||tier==='mythic')S.pity.leg=0;
+  if(tier==='mythic')S.pity.myth=0;
+  S.totalPulls++;
+  S.tempBoosts.forEach(b=>{if(b.pullsLeft>0)b.pullsLeft--;});
+  S.tempBoosts=S.tempBoosts.filter(b=>b.pullsLeft>0);
+  save();
+  showNextPull();
+}
+
+function claimSinglePull(){
+  if(getPullsAvailable()<=0){showToast('No pull tickets ready!');return;}
+  if(!isAdmin())S.daily.claimedPulls+=1;
+  _doPull();
+}
+
+function stickerPull(){
+  const cost=10;
+  if(!isAdmin()){
+    if(S.stickers<cost){showToast(`Need ${cost} stickers!`);return;}
+    S.stickers-=cost;
+  }
+  _doPull();
+}
+
+// ─── VERIFY SYSTEM ────────────────────────────────────────────────────────────
+
+let VS={taskId:null,timerSecs:0,running:false,interval:null,timerDone:false,photoDone:false,stream:null};
+
+function openVerify(id){
+  if(S.daily.done.includes(id)){showToast('Already completed!');return;}
+  const task=ALL_TASKS.find(t=>t.id===id);
+  if(!task)return;
+  VS={taskId:id,timerSecs:0,running:false,interval:null,timerDone:false,photoDone:false,stream:null};
+  const needTimer=task.verify==='timer'||task.verify==='both';
+  const needPhoto=task.verify==='photo'||task.verify==='both';
+  document.getElementById('v-task-name').textContent=`${task.icon} ${task.name}`;
+  document.getElementById('v-task-desc').textContent=task.desc;
+  // Timer
+  const ts=document.getElementById('v-timer-section');
+  if(needTimer){
+    ts.classList.remove('hidden');
+    document.getElementById('v-timer-goal').textContent=task.minTime+' min';
+    document.getElementById('v-timer-display').textContent='00:00';
+    document.getElementById('v-timer-bar').style.width='0%';
+    document.getElementById('v-timer-done').classList.add('hidden');
+    const tb=document.getElementById('v-timer-btn');
+    tb.textContent='▶ Start Timer';tb.disabled=false;
+  } else {
+    ts.classList.add('hidden');
+    VS.timerDone=true;
+  }
+  // Camera
+  const cs=document.getElementById('v-camera-section');
+  if(needPhoto){
+    cs.classList.remove('hidden');
+    document.getElementById('v-cam-status').textContent='Camera not started';
+    document.getElementById('v-preview').classList.add('hidden');
+    document.getElementById('v-thumb').classList.add('hidden');
+    document.getElementById('v-photo-done').classList.add('hidden');
+    document.getElementById('v-start-cam-btn').classList.remove('hidden');
+    document.getElementById('v-capture-btn').classList.add('hidden');
+    document.getElementById('v-retake-btn').classList.add('hidden');
+  } else {
+    cs.classList.add('hidden');
+    VS.photoDone=true;
+  }
+  _updateVerifyBtn();
+  document.getElementById('verify-overlay').classList.remove('hidden');
+}
+
+function closeVerify(){
+  _stopVerifyCam();
+  if(VS.interval)clearInterval(VS.interval);
+  document.getElementById('verify-overlay').classList.add('hidden');
+  VS={taskId:null,timerSecs:0,running:false,interval:null,timerDone:false,photoDone:false,stream:null};
+}
+
+function toggleVerifyTimer(){
+  if(VS.timerDone)return;
+  if(VS.running){
+    clearInterval(VS.interval);VS.running=false;
+    document.getElementById('v-timer-btn').textContent='▶ Resume Timer';
+  } else {
+    VS.running=true;
+    document.getElementById('v-timer-btn').textContent='⏸ Pause Timer';
+    const task=ALL_TASKS.find(t=>t.id===VS.taskId);
+    const goal=task.minTime*60;
+    VS.interval=setInterval(()=>{
+      VS.timerSecs++;
+      const mm=String(Math.floor(VS.timerSecs/60)).padStart(2,'0');
+      const ss=String(VS.timerSecs%60).padStart(2,'0');
+      document.getElementById('v-timer-display').textContent=`${mm}:${ss}`;
+      document.getElementById('v-timer-bar').style.width=Math.min(VS.timerSecs/goal*100,100)+'%';
+      if(VS.timerSecs>=goal&&!VS.timerDone){
+        VS.timerDone=true;clearInterval(VS.interval);VS.running=false;
+        const tb=document.getElementById('v-timer-btn');
+        tb.textContent='✓ Timer Complete!';tb.disabled=true;
+        document.getElementById('v-timer-done').classList.remove('hidden');
+        _updateVerifyBtn();
+      }
+    },1000);
+  }
+}
+
+async function startVerifyCamera(){
+  try{
+    VS.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    const vid=document.getElementById('v-preview');
+    vid.srcObject=VS.stream;vid.classList.remove('hidden');
+    document.getElementById('v-thumb').classList.add('hidden');
+    document.getElementById('v-cam-status').textContent='📷 Camera ready — position your shot';
+    document.getElementById('v-start-cam-btn').classList.add('hidden');
+    document.getElementById('v-capture-btn').classList.remove('hidden');
+  }catch(e){
+    VS.photoDone=true;
+    document.getElementById('v-cam-status').textContent='⚠️ Camera access denied — marked on trust';
+    document.getElementById('v-photo-done').classList.remove('hidden');
+    _updateVerifyBtn();
+  }
+}
+
+function captureVerifyPhoto(){
+  const vid=document.getElementById('v-preview');
+  const canvas=document.getElementById('v-capture-canvas');
+  canvas.width=vid.videoWidth;canvas.height=vid.videoHeight;
+  canvas.getContext('2d').drawImage(vid,0,0);
+  const thumb=document.getElementById('v-thumb');
+  thumb.src=canvas.toDataURL('image/jpeg',.8);
+  thumb.classList.remove('hidden');
+  vid.classList.add('hidden');
+  _stopVerifyCam();
+  VS.photoDone=true;
+  document.getElementById('v-cam-status').textContent='📸 Photo captured!';
+  document.getElementById('v-photo-done').classList.remove('hidden');
+  document.getElementById('v-capture-btn').classList.add('hidden');
+  document.getElementById('v-retake-btn').classList.remove('hidden');
+  _updateVerifyBtn();
+}
+
+function retakeVerifyPhoto(){
+  VS.photoDone=false;
+  document.getElementById('v-thumb').classList.add('hidden');
+  document.getElementById('v-photo-done').classList.add('hidden');
+  document.getElementById('v-retake-btn').classList.add('hidden');
+  document.getElementById('v-start-cam-btn').classList.remove('hidden');
+  document.getElementById('v-capture-btn').classList.add('hidden');
+  document.getElementById('v-cam-status').textContent='Camera not started';
+  _updateVerifyBtn();
+}
+
+function _stopVerifyCam(){
+  if(VS.stream){VS.stream.getTracks().forEach(t=>t.stop());VS.stream=null;}
+  const vid=document.getElementById('v-preview');
+  if(vid)vid.srcObject=null;
+}
+
+function _updateVerifyBtn(){
+  document.getElementById('v-complete-btn').disabled=!(VS.timerDone&&VS.photoDone);
+}
+
+function verifyComplete(){
+  const id=VS.taskId;
+  closeVerify();
+  completeTask(id);
+}
+
+// ─── MUSIC PLAYER ────────────────────────────────────────────────────────────
+
+const AMBIENT_TRACKS=[
+  {id:'rain',   name:'Gentle Rain',  icon:'🌧️'},
+  {id:'waves',  name:'Ocean Waves',  icon:'🌊'},
+  {id:'forest', name:'Forest Calm',  icon:'🌿'},
+  {id:'focus',  name:'Deep Focus',   icon:'🔮'},
+  {id:'lofi',   name:'Lo-fi Chill',  icon:'🎧'},
+  {id:'cafe',   name:'Café Murmur',  icon:'☕'},
+];
+
+let _AC=null,_masterGain=null,_musicNodes=[],_musicPlaying=false;
+let _musicVolume=0.5,_selTrackId=null,_userAudioEl=null,_userName='';
+
+function _getAC(){
+  if(!_AC) _AC=new(window.AudioContext||window.webkitAudioContext)();
+  if(_AC.state==='suspended') _AC.resume();
+  return _AC;
+}
+
+function _makeNoiseBuf(ac,sec=3){
+  const buf=ac.createBuffer(1,ac.sampleRate*sec,ac.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  return buf;
+}
+
+function _genRain(ac,out){
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,3); src.loop=true;
+  const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=900;
+  const hp=ac.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=250;
+  const g=ac.createGain(); g.gain.value=0.9;
+  const lfo=ac.createOscillator(); lfo.frequency.value=0.07;
+  const lg=ac.createGain(); lg.gain.value=0.12;
+  lfo.connect(lg); lg.connect(g.gain); lfo.start();
+  src.connect(lp); lp.connect(hp); hp.connect(g); g.connect(out); src.start();
+  return [src,lfo,lp,hp,g,lg];
+}
+
+function _genWaves(ac,out){
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,4); src.loop=true;
+  const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=350; lp.Q.value=0.6;
+  const g=ac.createGain(); g.gain.value=0.55;
+  const lfo=ac.createOscillator(); lfo.frequency.value=0.09;
+  const lg=ac.createGain(); lg.gain.value=0.45;
+  lfo.connect(lg); lg.connect(g.gain); lfo.start();
+  src.connect(lp); lp.connect(g); g.connect(out); src.start();
+  return [src,lfo,lp,g,lg];
+}
+
+function _genForest(ac,out){
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,3); src.loop=true;
+  const bp=ac.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=0.4;
+  const g=ac.createGain(); g.gain.value=0.35;
+  const drone=ac.createOscillator(); drone.type='sine'; drone.frequency.value=75;
+  const dg=ac.createGain(); dg.gain.value=0.04;
+  drone.connect(dg); dg.connect(out); drone.start();
+  src.connect(bp); bp.connect(g); g.connect(out); src.start();
+  return [src,drone,bp,g,dg];
+}
+
+function _genFocus(ac,out){
+  const o1=ac.createOscillator(); o1.type='sine'; o1.frequency.value=40;
+  const o2=ac.createOscillator(); o2.type='sine'; o2.frequency.value=44;
+  const g1=ac.createGain(); g1.gain.value=0.18;
+  const g2=ac.createGain(); g2.gain.value=0.18;
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,2); src.loop=true;
+  const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=180;
+  const ng=ac.createGain(); ng.gain.value=0.07;
+  o1.connect(g1); g1.connect(out); o1.start();
+  o2.connect(g2); g2.connect(out); o2.start();
+  src.connect(lp); lp.connect(ng); ng.connect(out); src.start();
+  return [o1,o2,src,g1,g2,ng,lp];
+}
+
+function _genLofi(ac,out){
+  // Simple repetitive pentatonic notes with noise bed
+  const notes=[261,294,349,392,440];
+  const oNodes=[];
+  notes.forEach((f,i)=>{
+    const o=ac.createOscillator(); o.type='triangle'; o.frequency.value=f;
+    const g=ac.createGain(); g.gain.value=0;
+    // Stagger note pulses
+    const startT=ac.currentTime+i*0.5;
+    g.gain.setValueAtTime(0,startT);
+    // Repeat every 2.5s
+    for(let t=startT;t<startT+120;t+=2.5){
+      g.gain.setValueAtTime(0.08,t);
+      g.gain.linearRampToValueAtTime(0,t+0.35);
+    }
+    o.connect(g); g.connect(out); o.start();
+    oNodes.push(o,g);
+  });
+  // Noise bed
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,2); src.loop=true;
+  const lp=ac.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=600;
+  const ng=ac.createGain(); ng.gain.value=0.06;
+  src.connect(lp); lp.connect(ng); ng.connect(out); src.start();
+  return [...oNodes,src,lp,ng];
+}
+
+function _genCafe(ac,out){
+  const src=ac.createBufferSource(); src.buffer=_makeNoiseBuf(ac,3); src.loop=true;
+  const bp1=ac.createBiquadFilter(); bp1.type='bandpass'; bp1.frequency.value=1100; bp1.Q.value=0.5;
+  const bp2=ac.createBiquadFilter(); bp2.type='bandpass'; bp2.frequency.value=380; bp2.Q.value=0.7;
+  const g1=ac.createGain(); g1.gain.value=0.2;
+  const g2=ac.createGain(); g2.gain.value=0.14;
+  const lfo=ac.createOscillator(); lfo.frequency.value=0.28;
+  const lg=ac.createGain(); lg.gain.value=0.08;
+  const master=ac.createGain(); master.gain.value=1;
+  lfo.connect(lg); lg.connect(master.gain); lfo.start();
+  src.connect(bp1); bp1.connect(g1); g1.connect(master);
+  src.connect(bp2); bp2.connect(g2); g2.connect(master);
+  master.connect(out); src.start();
+  return [src,lfo,bp1,bp2,g1,g2,master,lg];
+}
+
+const _GENERATORS={rain:_genRain,waves:_genWaves,forest:_genForest,focus:_genFocus,lofi:_genLofi,cafe:_genCafe};
+
+function _stopNodes(){
+  _musicNodes.forEach(n=>{try{if(n.stop)n.stop(0);n.disconnect();}catch(e){}});
+  _musicNodes=[];
+}
+
+function stopMusic(){
+  _stopNodes();
+  if(_userAudioEl){_userAudioEl.pause();}
+  _musicPlaying=false;
+  _updateMusicUI();
+}
+
+function playAmbientTrack(id){
+  stopMusic();
+  _selTrackId=id;
+  const ac=_getAC();
+  _masterGain=ac.createGain();
+  _masterGain.gain.value=_musicVolume;
+  _masterGain.connect(ac.destination);
+  const fn=_GENERATORS[id];
+  if(fn) _musicNodes=fn(ac,_masterGain);
+  _musicPlaying=true;
+  _updateMusicUI();
+}
+
+function toggleMusic(){
+  if(_musicPlaying){
+    if(_selTrackId==='user'&&_userAudioEl){_userAudioEl.pause();}
+    else _stopNodes();
+    _musicPlaying=false;
+  } else {
+    if(_selTrackId==='user'&&_userAudioEl){
+      _getAC();_userAudioEl.play();
+    } else if(_selTrackId){
+      playAmbientTrack(_selTrackId);return;
+    }
+    _musicPlaying=true;
+  }
+  _updateMusicUI();
+}
+
+function setMusicVolume(v){
+  _musicVolume=parseFloat(v);
+  if(_masterGain) _masterGain.gain.value=_musicVolume;
+  if(_userAudioEl) _userAudioEl.volume=_musicVolume;
+}
+
+function loadUserMusic(input){
+  const file=input.files[0];
+  if(!file)return;
+  stopMusic();
+  _selTrackId='user';
+  _userName=file.name.replace(/\.[^.]+$/,'');
+  if(_userAudioEl) URL.revokeObjectURL(_userAudioEl.src);
+  _userAudioEl=new Audio();
+  _userAudioEl.src=URL.createObjectURL(file);
+  _userAudioEl.loop=true;
+  _userAudioEl.volume=_musicVolume;
+  _userAudioEl.play().then(()=>{_musicPlaying=true;_updateMusicUI();}).catch(()=>{});
+  const nameEl=document.getElementById('music-user-name');
+  if(nameEl)nameEl.textContent='🎵 '+_userName;
+  _updateMusicUI();
+}
+
+function _updateMusicUI(){
+  // Track buttons
+  document.querySelectorAll('.music-track-btn').forEach(b=>{
+    b.classList.toggle('sel',b.dataset.id===_selTrackId);
+  });
+  // Play/pause button
+  const pp=document.getElementById('music-pp-btn');
+  if(pp){pp.textContent=_musicPlaying?'⏸ Pause':'▶ Play';pp.disabled=!_selTrackId;}
+  // Topbar pill
+  const pill=document.getElementById('tb-music-pill');
+  if(pill){
+    const t=AMBIENT_TRACKS.find(x=>x.id===_selTrackId);
+    pill.textContent=(t?t.icon:'🎵')+' Playing';
+    pill.classList.toggle('hidden',!_musicPlaying);
+  }
+}
+
+function renderMusicCard(){
+  const grid=document.getElementById('music-track-grid');
+  if(!grid)return;
+  grid.innerHTML=AMBIENT_TRACKS.map(t=>`
+    <button class="music-track-btn${_selTrackId===t.id?' sel':''}" data-id="${t.id}" onclick="playAmbientTrack('${t.id}')">
+      <span class="music-track-icon">${t.icon}</span>
+      <span class="music-track-name">${t.name}</span>
+    </button>`).join('');
+  const nameEl=document.getElementById('music-user-name');
+  if(nameEl&&_userName)nameEl.textContent='🎵 '+_userName;
+  _updateMusicUI();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+try {
+  if(S.created){
+    applyThemeById(S.character&&S.character.theme||'sage');
+    document.getElementById('create-overlay').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    try{initDaily();}catch(e){console.error('initDaily',e);}
+    try{renderAll();}catch(e){console.error('renderAll',e);}
+    try{checkDailyNotification();}catch(e){}
+  } else {
+    initCreateUI();
+  }
+} catch(e) {
+  console.error('Init error:',e);
+  // Fallback: show create overlay
+  document.getElementById('create-overlay').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  initCreateUI();
+}
+</script>
+</body>
+</html>
