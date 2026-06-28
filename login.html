@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Quest ✨</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Indie+Flower&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Comic Neue', cursive;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f5f0 0%, #e6f4f1 50%, #ede8e3 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 16px 60px;
+    }
+    .wrap { width: 100%; max-width: 420px; }
+    .header { text-align: center; margin-bottom: 20px; }
+    .header .emoji { font-size: 3rem; display: block; margin-bottom: 8px; }
+    .header h1 { font-size: 2rem; color: #0d9488; font-weight: 700; margin-bottom: 4px; }
+    .header p { font-size: 0.82rem; color: #78716c; }
+    .card {
+      background: #fff; border-radius: 20px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+      border: 1px solid #e5e7eb; overflow: hidden;
+    }
+    .tabs { display: flex; border-bottom: 1px solid #e5e7eb; background: #fafaf9; }
+    .tab {
+      flex: 1; padding: 14px; font-size: 0.85rem; font-weight: 700;
+      font-family: 'Comic Neue', cursive; cursor: pointer;
+      background: none; border: none; color: #a8a29e;
+      transition: all 0.2s; border-bottom: 2px solid transparent;
+    }
+    .tab.active { background: #fff; color: #0d9488; border-bottom-color: #14b8a6; }
+    .form-body { padding: 24px 28px 28px; }
+    .hint { text-align: center; color: #78716c; font-size: 0.83rem; margin-bottom: 18px; }
+    .error-box {
+      background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c;
+      border-radius: 12px; padding: 12px 16px; font-size: 0.83rem;
+      margin-bottom: 14px; display: none; align-items: flex-start; gap: 8px;
+    }
+    .error-box.show { display: flex; }
+    label { display: block; font-size: 0.85rem; font-weight: 700; color: #57534e; margin-bottom: 6px; }
+    input[type="text"] {
+      width: 100%; border: 1px solid #e5e7eb; border-radius: 12px;
+      padding: 12px 16px; font-size: 0.9rem; font-family: 'Comic Neue', cursive;
+      background: #fafaf9; color: #1c1917; outline: none; transition: all 0.2s;
+    }
+    input[type="text"]:focus { background: #fff; box-shadow: 0 0 0 2px #99f6e4; border-color: #99f6e4; }
+    input[type="text"].err { border-color: #f87171; background: #fef2f2; }
+    .field-err { font-size: 0.75rem; color: #ef4444; margin-top: 6px; display: none; }
+    .field-err.show { display: block; }
+    .field-hint { font-size: 0.75rem; color: #a8a29e; margin-top: 6px; }
+    .btn-submit {
+      width: 100%; margin-top: 18px; padding: 13px;
+      border-radius: 12px; border: none; cursor: pointer;
+      background: linear-gradient(to right, #14b8a6, #0d9488);
+      color: #fff; font-weight: 700; font-size: 0.9rem;
+      font-family: 'Comic Neue', cursive;
+      box-shadow: 0 4px 14px rgba(20,184,166,0.3);
+      transition: all 0.2s;
+    }
+    .btn-submit:hover { background: linear-gradient(to right, #0d9488, #0f766e); }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Account cards */
+    .acct-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .acct-card {
+      display: flex; align-items: center; gap: 12px;
+      border: 1.5px solid #e5e7eb; border-radius: 14px;
+      padding: 12px 14px; cursor: pointer; transition: all 0.18s;
+      background: #fafaf9;
+    }
+    .acct-card:hover { border-color: #14b8a6; background: #f0fdfa; }
+    .acct-card.loading { opacity: 0.6; pointer-events: none; }
+    .acct-avatar { font-size: 2rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .acct-info { flex: 1; min-width: 0; }
+    .acct-name { font-weight: 700; font-size: 0.95rem; color: #1c1917; }
+    .acct-sub { font-size: 0.75rem; color: #78716c; margin-top: 2px; }
+    .acct-arrow { color: #a8a29e; font-size: 1.2rem; }
+    .divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 18px 0 14px; color: #a8a29e; font-size: 0.75rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #e5e7eb;
+    }
+    .empty-state { text-align: center; padding: 20px 0 8px; color: #a8a29e; font-size: 0.85rem; }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 8px; }
+    .switch-hint { text-align: center; font-size: 0.78rem; color: #a8a29e; margin-top: 16px; }
+    .switch-hint button {
+      background: none; border: none; color: #0d9488; font-weight: 700;
+      cursor: pointer; font-family: 'Comic Neue', cursive; font-size: 0.78rem;
+    }
+    .switch-hint button:hover { text-decoration: underline; }
+    .footer { text-align: center; font-size: 0.72rem; color: #a8a29e; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="header">
+      <span class="emoji">✨</span>
+      <h1>Daily Quest</h1>
+      <p>Your companion adventure awaits</p>
+    </div>
+    <div class="card">
+      <div class="tabs">
+        <button class="tab" id="tab-login" onclick="switchTab('login')">🧚 My Companion</button>
+        <button class="tab" id="tab-signup" onclick="switchTab('signup')">✨ New Companion</button>
+      </div>
+
+      <!-- MY COMPANION (login) -->
+      <div id="panel-login" class="form-body" style="display:none">
+        <p class="hint">Choose your companion to continue your adventure</p>
+        <div class="error-box" id="login-error-box">
+          <span>❌</span><span id="login-error-msg"></span>
+        </div>
+        <div id="acct-list" class="acct-list"></div>
+        <div id="login-empty" class="empty-state" style="display:none">
+          <div class="empty-icon">😔</div>
+          No saved companions found on this device.
+        </div>
+        <div class="divider" id="search-divider">or search by name</div>
+        <div>
+          <input type="text" id="search-name" autocomplete="off"
+            placeholder="Type companion name…" maxlength="20"
+            oninput="clearLoginError()">
+          <p class="field-err" id="search-err"></p>
+        </div>
+        <button class="btn-submit" id="search-btn" onclick="loginBySearch()">Find My Companion →</button>
+        <p class="switch-hint">
+          New here? <button type="button" onclick="switchTab('signup')">Create a companion</button>
+        </p>
+      </div>
+
+      <!-- NEW COMPANION (signup) -->
+      <div id="panel-signup" class="form-body" style="display:none">
+        <p class="hint">Give your new companion a name to begin</p>
+        <div class="error-box" id="signup-error-box">
+          <span>❌</span><span id="signup-error-msg"></span>
+        </div>
+        <form id="signup-form" onsubmit="handleSignup(event)" novalidate>
+          <div>
+            <label for="signup-name">Companion Name</label>
+            <input type="text" id="signup-name" autocomplete="off" maxlength="20"
+              placeholder="Choose a name…" oninput="clearSignupError()">
+            <p class="field-err" id="signup-field-err"></p>
+            <p class="field-hint">2–20 characters · letters, numbers, spaces, - _ ' allowed</p>
+          </div>
+          <button type="submit" class="btn-submit" id="signup-btn">Begin Adventure ✨</button>
+        </form>
+        <p class="switch-hint">
+          Already have one? <button type="button" onclick="switchTab('login')">Find my companion</button>
+        </p>
+      </div>
+    </div>
+    <p class="footer">Secured by Supabase 🔒</p>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://slcerhofjlalxrruntxp.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNsY2VyaG9mamxhbHhycnVudHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MDc5NTgsImV4cCI6MjA5ODA4Mzk1OH0.t7NIX694tWd6XAIEUKxPEJtEmXlOFe3Nf83Bf3fBVrY';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function companionCreds(name) {
+      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      return {
+        email: `${slug}@companion.dailyquest.app`,
+        password: `DQ__${name}__companion__v1`,
+      };
+    }
+
+    function getAccounts() {
+      try { return Object.values(JSON.parse(localStorage.getItem('dqAccounts') || '{}')); }
+      catch (e) { return []; }
+    }
+
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+      document.getElementById('panel-login').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('panel-signup').style.display = tab === 'signup' ? 'block' : 'none';
+      if (tab === 'login') renderAccounts();
+      if (tab === 'signup') setTimeout(() => document.getElementById('signup-name').focus(), 50);
+    }
+
+    function renderAccounts() {
+      const accounts = getAccounts().filter(a => a.created && a.character && a.character.name);
+      const list = document.getElementById('acct-list');
+      const empty = document.getElementById('login-empty');
+      const divider = document.getElementById('search-divider');
+
+      if (!accounts.length) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        divider.style.display = 'none';
+        return;
+      }
+
+      empty.style.display = 'none';
+      divider.style.display = 'flex';
+      list.innerHTML = accounts.map(a => {
+        const avatar = a.character.avatar || '🧚';
+        const isEmoji = !avatar.match(/^[a-z]/i);
+        const avatarHTML = isEmoji
+          ? `<span>${avatar}</span>`
+          : `<span>⚔️</span>`;
+        return `<div class="acct-card" onclick="loginAsCard('${a.character.name.replace(/'/g, "\\'")}', this)">
+          <div class="acct-avatar">${avatarHTML}</div>
+          <div class="acct-info">
+            <div class="acct-name">${a.character.name}</div>
+            <div class="acct-sub">🔥 ${a.streak || 0} streak · 🏷️ ${a.stickers || 0} stickers · ✅ ${a.totalTasksDone || 0} tasks</div>
+          </div>
+          <div class="acct-arrow">›</div>
+        </div>`;
+      }).join('');
+    }
+
+    async function loginAsCard(name, cardEl) {
+      clearLoginError();
+      cardEl.classList.add('loading');
+      cardEl.querySelector('.acct-arrow').textContent = '…';
+      const { email, password } = companionCreds(name);
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        cardEl.classList.remove('loading');
+        cardEl.querySelector('.acct-arrow').textContent = '›';
+        showLoginError('Could not log in — try searching by name instead.');
+        return;
+      }
+      window.location.href = 'daily-quest.html';
+    }
+
+    async function loginBySearch() {
+      clearLoginError();
+      const name = document.getElementById('search-name').value.trim();
+      if (!name) {
+        document.getElementById('search-err').textContent = 'Please enter your companion\'s name.';
+        document.getElementById('search-err').classList.add('show');
+        document.getElementById('search-name').classList.add('err');
+        return;
+      }
+      const btn = document.getElementById('search-btn');
+      btn.disabled = true; btn.textContent = 'Searching…';
+      const { email, password } = companionCreds(name);
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) {
+        btn.disabled = false; btn.textContent = 'Find My Companion →';
+        showLoginError('No companion found with that name. Check the spelling or create a new one.');
+        return;
+      }
+      window.location.href = 'daily-quest.html';
+    }
+
+    async function handleSignup(e) {
+      e.preventDefault();
+      clearSignupError();
+      const name = document.getElementById('signup-name').value.trim();
+      const fieldErr = document.getElementById('signup-field-err');
+
+      if (!name) { fieldErr.textContent = 'Please enter a companion name.'; fieldErr.classList.add('show'); return; }
+      if (name.length < 2) { fieldErr.textContent = 'Name must be at least 2 characters.'; fieldErr.classList.add('show'); return; }
+      if (name.length > 20) { fieldErr.textContent = 'Name can be at most 20 characters.'; fieldErr.classList.add('show'); return; }
+      if (!/^[a-zA-Z0-9 _'-]+$/.test(name)) {
+        fieldErr.textContent = "Only letters, numbers, spaces, and - _ ' are allowed.";
+        fieldErr.classList.add('show'); return;
+      }
+
+      const btn = document.getElementById('signup-btn');
+      btn.disabled = true; btn.textContent = 'One moment…';
+
+      const { email, password } = companionCreds(name);
+      const { error } = await sb.auth.signUp({
+        email, password,
+        options: { data: { companion_name: name } },
+      });
+
+      if (error) {
+        btn.disabled = false; btn.textContent = 'Begin Adventure ✨';
+        const msg = error.message.toLowerCase().includes('already registered')
+          ? 'That companion name is already taken — try a different one!'
+          : error.message;
+        document.getElementById('signup-error-msg').textContent = msg;
+        document.getElementById('signup-error-box').classList.add('show');
+        return;
+      }
+
+      localStorage.setItem('dqPendingName', name);
+      window.location.href = 'daily-quest.html';
+    }
+
+    function clearLoginError() {
+      document.getElementById('login-error-box').classList.remove('show');
+      document.getElementById('search-err').classList.remove('show');
+      document.getElementById('search-name').classList.remove('err');
+    }
+    function showLoginError(msg) {
+      document.getElementById('login-error-msg').textContent = msg;
+      document.getElementById('login-error-box').classList.add('show');
+    }
+    function clearSignupError() {
+      document.getElementById('signup-error-box').classList.remove('show');
+      document.getElementById('signup-field-err').classList.remove('show');
+      document.getElementById('signup-name').classList.remove('err');
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    switchTab(params.get('tab') === 'signup' ? 'signup' : 'login');
+  </script>
+</body>
+</html>
