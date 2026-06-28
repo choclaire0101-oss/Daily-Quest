@@ -66,30 +66,6 @@
     .btn-submit:hover { background: linear-gradient(to right, #0d9488, #0f766e); }
     .btn-submit:active { transform: scale(0.98); }
     .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-    /* Account cards */
-    .acct-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-    .acct-card {
-      display: flex; align-items: center; gap: 12px;
-      border: 1.5px solid #e5e7eb; border-radius: 14px;
-      padding: 12px 14px; cursor: pointer; transition: all 0.18s;
-      background: #fafaf9;
-    }
-    .acct-card:hover { border-color: #14b8a6; background: #f0fdfa; }
-    .acct-card.loading { opacity: 0.6; pointer-events: none; }
-    .acct-avatar { font-size: 2rem; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .acct-info { flex: 1; min-width: 0; }
-    .acct-name { font-weight: 700; font-size: 0.95rem; color: #1c1917; }
-    .acct-sub { font-size: 0.75rem; color: #78716c; margin-top: 2px; }
-    .acct-arrow { color: #a8a29e; font-size: 1.2rem; }
-    .divider {
-      display: flex; align-items: center; gap: 10px;
-      margin: 18px 0 14px; color: #a8a29e; font-size: 0.75rem;
-    }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: #e5e7eb;
-    }
-    .empty-state { text-align: center; padding: 20px 0 8px; color: #a8a29e; font-size: 0.85rem; }
-    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 8px; }
     .switch-hint { text-align: center; font-size: 0.78rem; color: #a8a29e; margin-top: 16px; }
     .switch-hint button {
       background: none; border: none; color: #0d9488; font-weight: 700;
@@ -114,20 +90,15 @@
 
       <!-- MY COMPANION (login) -->
       <div id="panel-login" class="form-body" style="display:none">
-        <p class="hint">Choose your companion to continue your adventure</p>
+        <p class="hint">Enter your companion's exact name to continue your adventure</p>
         <div class="error-box" id="login-error-box">
           <span>❌</span><span id="login-error-msg"></span>
         </div>
-        <div id="acct-list" class="acct-list"></div>
-        <div id="login-empty" class="empty-state" style="display:none">
-          <div class="empty-icon">😔</div>
-          No saved companions found on this device.
-        </div>
-        <div class="divider" id="search-divider">or search by name</div>
         <div>
-          <input type="text" id="search-name" autocomplete="off"
-            placeholder="Type companion name…" maxlength="20"
-            oninput="clearLoginError()">
+          <label for="search-name">Companion Name</label>
+          <input type="text" id="search-name" autocomplete="off" autofocus
+            placeholder="Type exact name…" maxlength="20"
+            oninput="clearLoginError()" onkeydown="if(event.key==='Enter')loginBySearch()">
           <p class="field-err" id="search-err"></p>
         </div>
         <button class="btn-submit" id="search-btn" onclick="loginBySearch()">Find My Companion →</button>
@@ -173,65 +144,13 @@
       };
     }
 
-    function getAccounts() {
-      try { return Object.values(JSON.parse(localStorage.getItem('dqAccounts') || '{}')); }
-      catch (e) { return []; }
-    }
-
     function switchTab(tab) {
       document.getElementById('tab-login').classList.toggle('active', tab === 'login');
       document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
       document.getElementById('panel-login').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('panel-signup').style.display = tab === 'signup' ? 'block' : 'none';
-      if (tab === 'login') renderAccounts();
+      if (tab === 'login') setTimeout(() => document.getElementById('search-name').focus(), 50);
       if (tab === 'signup') setTimeout(() => document.getElementById('signup-name').focus(), 50);
-    }
-
-    function renderAccounts() {
-      const accounts = getAccounts().filter(a => a.created && a.character && a.character.name && a.character.name !== 'BAM_doakkaebi');
-      const list = document.getElementById('acct-list');
-      const empty = document.getElementById('login-empty');
-      const divider = document.getElementById('search-divider');
-
-      if (!accounts.length) {
-        list.innerHTML = '';
-        empty.style.display = 'block';
-        divider.style.display = 'none';
-        return;
-      }
-
-      empty.style.display = 'none';
-      divider.style.display = 'flex';
-      list.innerHTML = accounts.map(a => {
-        const avatar = a.character.avatar || '🧚';
-        const isEmoji = !avatar.match(/^[a-z]/i);
-        const avatarHTML = isEmoji
-          ? `<span>${avatar}</span>`
-          : `<span>⚔️</span>`;
-        return `<div class="acct-card" onclick="loginAsCard('${a.character.name.replace(/'/g, "\\'")}', this)">
-          <div class="acct-avatar">${avatarHTML}</div>
-          <div class="acct-info">
-            <div class="acct-name">${a.character.name}</div>
-            <div class="acct-sub">🔥 ${a.streak || 0} streak · 🏷️ ${a.stickers || 0} stickers · ✅ ${a.totalTasksDone || 0} tasks</div>
-          </div>
-          <div class="acct-arrow">›</div>
-        </div>`;
-      }).join('');
-    }
-
-    async function loginAsCard(name, cardEl) {
-      clearLoginError();
-      cardEl.classList.add('loading');
-      cardEl.querySelector('.acct-arrow').textContent = '…';
-      const { email, password } = companionCreds(name);
-      const { error } = await sb.auth.signInWithPassword({ email, password });
-      if (error) {
-        cardEl.classList.remove('loading');
-        cardEl.querySelector('.acct-arrow').textContent = '›';
-        showLoginError('Could not log in — try searching by name instead.');
-        return;
-      }
-      window.location.href = 'daily-quest.html';
     }
 
     async function loginBySearch() {
@@ -251,6 +170,21 @@
         btn.disabled = false; btn.textContent = 'Find My Companion →';
         showLoginError('No companion found with that name. Check the spelling or create a new one.');
         return;
+      }
+      try {
+        const accounts = JSON.parse(localStorage.getItem('dqAccounts') || '{}');
+        const match = Object.values(accounts).find(
+          a => a.character?.name?.toLowerCase() === name.toLowerCase()
+        );
+        if (match) {
+          localStorage.setItem('dailyQuest', JSON.stringify(match));
+        } else {
+          localStorage.removeItem('dailyQuest');
+          localStorage.setItem('dqPendingName', name);
+        }
+      } catch (e) {
+        localStorage.removeItem('dailyQuest');
+        localStorage.setItem('dqPendingName', name);
       }
       window.location.href = 'daily-quest.html';
     }
